@@ -9,6 +9,7 @@ import { useBranches } from '@/lib/branch';
 import { errorText, todayLocal } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
 import { PhoneBooking } from './PhoneBooking';
+import { useT } from '@/lib/i18n';
 
 interface Reservation {
   _id: string;
@@ -21,14 +22,15 @@ interface Reservation {
   notes?: string;
   status: 'confirmed' | 'cancelled' | 'no_show' | 'seated';
 }
-const STATUS: Record<Reservation['status'], { label: string; tone: 'blue' | 'green' | 'grey' | 'red' }> = {
-  confirmed: { label: 'Confirmada', tone: 'blue' },
-  seated: { label: 'Sentados', tone: 'green' },
-  no_show: { label: 'No se presentó', tone: 'red' },
-  cancelled: { label: 'Cancelada', tone: 'grey' },
+const STATUS: Record<Reservation['status'], { label: [string, string]; tone: 'blue' | 'green' | 'grey' | 'red' }> = {
+  confirmed: { label: ['Confirmada', 'Confirmed'], tone: 'blue' },
+  seated: { label: ['Sentados', 'Seated'], tone: 'green' },
+  no_show: { label: ['No se presentó', 'No-show'], tone: 'red' },
+  cancelled: { label: ['Cancelada', 'Cancelled'], tone: 'grey' },
 };
 
 export default function ReservationsPage() {
+  const t = useT();
   const { can } = useAuth();
   const { branchParam, byId, branches } = useBranches();
   const { toast, confirm } = useFeedback();
@@ -43,17 +45,17 @@ export default function ReservationsPage() {
     if (
       status === 'cancelled' &&
       !(await confirm({
-        title: 'Cancelar reserva',
-        message: `¿Cancelar la reserva de ${x.name} (${x.partySize} pers., ${x.time})?`,
+        title: t('Cancelar reserva', 'Cancel reservation'),
+        message: t(`¿Cancelar la reserva de ${x.name} (${x.partySize} pers., ${x.time})?`, `Cancel the reservation for ${x.name} (${x.partySize} guests, ${x.time})?`),
         danger: true,
-        confirmLabel: 'Cancelar reserva',
+        confirmLabel: t('Cancelar reserva', 'Cancel reservation'),
       }))
     )
       return;
     setBusy(x._id);
     try {
       await api(`/api/v1/admin/reservations/${x._id}/status`, { method: 'POST', body: { status } });
-      toast(`${x.name}: ${STATUS[status].label.toLowerCase()}`);
+      toast(`${x.name}: ${t(...STATUS[status].label).toLowerCase()}`);
       r.reload();
     } catch (e) {
       toast(errorText(e), 'error');
@@ -65,44 +67,44 @@ export default function ReservationsPage() {
   return (
     <>
       <PageHeader
-        title="Reservas"
-        subtitle={r.data ? `${active.length} reservas · ${active.reduce((n, x) => n + x.partySize, 0)} comensales` : undefined}
+        title={t('Reservas', 'Reservations')}
+        subtitle={r.data ? t(`${active.length} reservas · ${active.reduce((n, x) => n + x.partySize, 0)} comensales`, `${active.length} reservations · ${active.reduce((n, x) => n + x.partySize, 0)} guests`) : undefined}
         actions={
           can('reservations:write') ? (
             <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>
-              Reserva por teléfono
+              {t('Reserva por teléfono', 'Phone reservation')}
             </Button>
           ) : null
         }
       />
       <div className="filters">
         <Button size="sm" variant={date === todayLocal() ? 'secondary' : 'ghost'} onClick={() => setDate(todayLocal())}>
-          Hoy
+          {t('Hoy', 'Today')}
         </Button>
         <Button size="sm" variant={date === todayLocal(1) ? 'secondary' : 'ghost'} onClick={() => setDate(todayLocal(1))}>
-          Mañana
+          {t('Mañana', 'Tomorrow')}
         </Button>
-        <input className="input" type="date" aria-label="Fecha" value={date} onChange={(e) => setDate(e.target.value)} />
+        <input className="input" type="date" aria-label={t('Fecha', 'Date')} value={date} onChange={(e) => setDate(e.target.value)} />
       </div>
       {r.error ? <Alert tone="danger">{errorText(r.error)}</Alert> : null}
       <Card padded={false}>
         {r.loading ? (
           <Spinner />
         ) : items.length === 0 ? (
-          <Empty icon="calendar" title="No hay reservas este día" />
+          <Empty icon="calendar" title={t('No hay reservas este día', 'No reservations this day')} />
         ) : (
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Hora</th>
-                  <th>Nombre</th>
-                  <th className="num">Personas</th>
-                  <th>Teléfono</th>
-                  {branches.length > 1 ? <th>Restaurante</th> : null}
-                  <th>Notas</th>
-                  <th>Estado</th>
-                  <th aria-label="Acciones" />
+                  <th>{t('Hora', 'Time')}</th>
+                  <th>{t('Nombre', 'Name')}</th>
+                  <th className="num">{t('Personas', 'Guests')}</th>
+                  <th>{t('Teléfono', 'Phone')}</th>
+                  {branches.length > 1 ? <th>{t('Restaurante', 'Restaurant')}</th> : null}
+                  <th>{t('Notas', 'Notes')}</th>
+                  <th>{t('Estado', 'Status')}</th>
+                  <th aria-label={t('Acciones', 'Actions')} />
                 </tr>
               </thead>
               <tbody>
@@ -119,19 +121,19 @@ export default function ReservationsPage() {
                     {branches.length > 1 ? <td>{byId(x.branchId)?.name}</td> : null}
                     <td className="small muted">{x.notes ?? ''}</td>
                     <td>
-                      <Badge tone={STATUS[x.status].tone}>{STATUS[x.status].label}</Badge>
+                      <Badge tone={STATUS[x.status].tone}>{t(...STATUS[x.status].label)}</Badge>
                     </td>
                     <td className="num">
                       {can('reservations:write') && x.status === 'confirmed' ? (
                         <span className="row" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                           <Button size="sm" variant="success" disabled={busy === x._id} onClick={() => void setStatus(x, 'seated')}>
-                            Sentados
+                            {t('Sentados', 'Seated')}
                           </Button>
                           <Button size="sm" variant="ghost" disabled={busy === x._id} onClick={() => void setStatus(x, 'no_show')}>
-                            No vino
+                            {t('No vino', 'No-show')}
                           </Button>
                           <Button size="sm" variant="ghost" disabled={busy === x._id} onClick={() => void setStatus(x, 'cancelled')}>
-                            Cancelar
+                            {t('Cancelar', 'Cancel')}
                           </Button>
                         </span>
                       ) : null}

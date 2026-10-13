@@ -7,9 +7,11 @@ import { api, qs } from '@/lib/api';
 import { useBranches } from '@/lib/branch';
 import { errorText } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 /** Booking taken by phone: same capacity rules as online bookings (public endpoint, not linked to the staff account). */
 export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: string; onClose: () => void; onDone: () => void }) {
+  const t = useT();
   const { branches, selected } = useBranches();
   const { toast } = useFeedback();
   const bookable = branches.filter((b) => b.reservations?.enabled);
@@ -27,7 +29,7 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
   );
 
   async function submit() {
-    if (!time || name.trim().length < 2 || !/^\+?[0-9 ]{9,16}$/.test(phone.trim())) return setError('Completa hora, nombre y un teléfono válido.');
+    if (!time || name.trim().length < 2 || !/^\+?[0-9 ]{9,16}$/.test(phone.trim())) return setError(t('Completa hora, nombre y un teléfono válido.', 'Fill in time, name and a valid phone number.'));
     setBusy(true);
     setError(null);
     try {
@@ -45,7 +47,7 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
           acceptTerms: true,
         },
       });
-      toast(`Reserva creada: ${name.trim()}, ${party} pers., ${time}`);
+      toast(t(`Reserva creada: ${name.trim()}, ${party} pers., ${time}`, `Reservation created: ${name.trim()}, ${party} guests, ${time}`));
       onDone();
     } catch (e) {
       setError(errorText(e));
@@ -58,32 +60,32 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
     <Modal
       open
       onClose={onClose}
-      title="Nueva reserva por teléfono"
+      title={t('Nueva reserva por teléfono', 'New phone reservation')}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="primary" loading={busy} onClick={() => void submit()}>
-            Reservar
+            {t('Reservar', 'Book')}
           </Button>
         </>
       }
     >
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        {bookable.length === 0 ? <Alert tone="warning">Ningún restaurante tiene las reservas online activadas.</Alert> : null}
+        {bookable.length === 0 ? <Alert tone="warning">{t('Ningún restaurante tiene las reservas online activadas.', 'No restaurant has online reservations enabled.')}</Alert> : null}
         <div className="grid-3">
-          <SelectField label="Restaurante" value={branchId} onChange={(e) => (setBranchId(e.target.value), setTime(''))}>
+          <SelectField label={t('Restaurante', 'Restaurant')} value={branchId} onChange={(e) => (setBranchId(e.target.value), setTime(''))}>
             {bookable.map((b) => (
               <option key={b.id} value={b.id}>
                 {b.name}
               </option>
             ))}
           </SelectField>
-          <TextField label="Fecha" type="date" value={date} onChange={(e) => (setDate(e.target.value), setTime(''))} />
+          <TextField label={t('Fecha', 'Date')} type="date" value={date} onChange={(e) => (setDate(e.target.value), setTime(''))} />
           <TextField
-            label="Personas"
+            label={t('Personas', 'Guests')}
             type="number"
             min={1}
             max={50}
@@ -92,13 +94,13 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
           />
         </div>
         <div className="field">
-          <span>Hora</span>
+          <span>{t('Hora', 'Time')}</span>
           {slots.loading ? (
             <Spinner />
           ) : slots.error ? (
             <Alert tone="warning">{errorText(slots.error)}</Alert>
           ) : (slots.data?.slots ?? []).length === 0 ? (
-            <p className="muted">Sin horas disponibles ese día.</p>
+            <p className="muted">{t('Sin horas disponibles ese día.', 'No times available that day.')}</p>
           ) : (
             <div className="chips">
               {slots.data!.slots.map((s) => (
@@ -110,10 +112,10 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
           )}
         </div>
         <div className="grid-2">
-          <TextField label="Nombre" value={name} onChange={(e) => setName(e.target.value)} required />
-          <TextField label="Teléfono" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+          <TextField label={t('Nombre', 'Name')} value={name} onChange={(e) => setName(e.target.value)} required />
+          <TextField label={t('Teléfono', 'Phone')} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </div>
-        <TextArea label="Notas" value={notes} maxLength={500} onChange={(e) => setNotes(e.target.value)} placeholder="Trona, alergias, terraza…" />
+        <TextArea label={t('Notas', 'Notes')} value={notes} maxLength={500} onChange={(e) => setNotes(e.target.value)} placeholder={t('Trona, alergias, terraza…', 'High chair, allergies, terrace…')} />
       </div>
     </Modal>
   );

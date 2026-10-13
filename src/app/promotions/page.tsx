@@ -9,8 +9,10 @@ import { useBranches } from '@/lib/branch';
 import { errorText, formatDate, formatEur } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
 import { CouponModal, type Coupon } from './CouponModal';
+import { useT } from '@/lib/i18n';
 
 export default function PromotionsPage() {
+  const t = useT();
   const { can } = useAuth();
   const { byId } = useBranches();
   const { toast } = useFeedback();
@@ -21,7 +23,7 @@ export default function PromotionsPage() {
   async function toggle(c: Coupon) {
     try {
       await api(`/api/v1/admin/promotions/${c._id}`, { method: 'PATCH', body: { active: !c.active } });
-      toast(`${c.code} ${!c.active ? 'activado' : 'desactivado'}`);
+      toast(`${c.code} ${!c.active ? t('activado', 'activated') : t('desactivado', 'deactivated')}`);
       r.reload();
     } catch (e) {
       toast(errorText(e), 'error');
@@ -31,12 +33,12 @@ export default function PromotionsPage() {
   return (
     <>
       <PageHeader
-        title="Promociones"
-        subtitle="Códigos de descuento para la web y la app. Las ofertas públicas aparecen en la página «Ofertas»."
+        title={t('Promociones', 'Promotions')}
+        subtitle={t('Códigos de descuento para la web y la app. Las ofertas públicas aparecen en la página «Ofertas».', 'Discount codes for the website and app. Public offers appear on the “Offers” page.')}
         actions={
           can('promotions:write') ? (
             <Button variant="primary" icon="plus" onClick={() => setEdit('new')}>
-              Nuevo código
+              {t('Nuevo código', 'New code')}
             </Button>
           ) : null
         }
@@ -46,19 +48,19 @@ export default function PromotionsPage() {
         {r.loading ? (
           <Spinner />
         ) : items.length === 0 ? (
-          <Empty icon="tag" title="Todavía no hay promociones" />
+          <Empty icon="tag" title={t('Todavía no hay promociones', 'No promotions yet')} />
         ) : (
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Código</th>
-                  <th>Descuento</th>
-                  <th>Condiciones</th>
-                  <th>Vigencia</th>
-                  <th className="num">Usos</th>
-                  <th>Estado</th>
-                  <th aria-label="Acciones" />
+                  <th>{t('Código', 'Code')}</th>
+                  <th>{t('Descuento', 'Discount')}</th>
+                  <th>{t('Condiciones', 'Conditions')}</th>
+                  <th>{t('Vigencia', 'Validity')}</th>
+                  <th className="num">{t('Usos', 'Uses')}</th>
+                  <th>{t('Estado', 'Status')}</th>
+                  <th aria-label={t('Acciones', 'Actions')} />
                 </tr>
               </thead>
               <tbody>
@@ -72,28 +74,28 @@ export default function PromotionsPage() {
                       </td>
                       <td>
                         {c.type === 'percent' ? `${(c.percentBps ?? 0) / 100} %` : formatEur(c.amountCents)}
-                        {c.maxDiscountCents ? <div className="muted small">máx. {formatEur(c.maxDiscountCents)}</div> : null}
+                        {c.maxDiscountCents ? <div className="muted small">{t('máx.', 'max.')} {formatEur(c.maxDiscountCents)}</div> : null}
                       </td>
                       <td className="small">
-                        {c.minSubtotalCents ? `Mínimo ${formatEur(c.minSubtotalCents)}` : 'Sin mínimo'}
-                        {c.fulfilment !== 'any' ? ` · solo ${c.fulfilment === 'pickup' ? 'recogida' : 'reparto'}` : ''}
+                        {c.minSubtotalCents ? t(`Mínimo ${formatEur(c.minSubtotalCents)}`, `Minimum ${formatEur(c.minSubtotalCents)}`) : t('Sin mínimo', 'No minimum')}
+                        {c.fulfilment !== 'any' ? ` · ${c.fulfilment === 'pickup' ? t('solo recogida', 'pickup only') : t('solo reparto', 'delivery only')}` : ''}
                         <div className="muted">
-                          {c.branchIds.length ? c.branchIds.map((id) => byId(id)?.name.replace('La Toscana ', '') ?? '—').join(', ') : 'Todos los restaurantes'}
+                          {c.branchIds.length ? c.branchIds.map((id) => byId(id)?.name.replace('La Toscana ', '') ?? '—').join(', ') : t('Todos los restaurantes', 'All restaurants')}
                         </div>
                       </td>
                       <td className="small">
-                        {c.validFrom ? formatDate(c.validFrom) : 'Desde ya'} → {c.validTo ? formatDate(c.validTo) : 'sin fin'}
+                        {c.validFrom ? formatDate(c.validFrom) : t('Desde ya', 'From now')} → {c.validTo ? formatDate(c.validTo) : t('sin fin', 'no end')}
                       </td>
                       <td className="num">
                         {c.redemptions ?? 0}
                         {c.maxRedemptions ? ` / ${c.maxRedemptions}` : ''}
                       </td>
                       <td>
-                        {expired ? <Badge tone="grey">Caducado</Badge> : c.active ? <Badge tone="green">Activo</Badge> : <Badge tone="grey">Inactivo</Badge>}
+                        {expired ? <Badge tone="grey">{t('Caducado', 'Expired')}</Badge> : c.active ? <Badge tone="green">{t('Activo', 'Active')}</Badge> : <Badge tone="grey">{t('Inactivo', 'Inactive')}</Badge>}
                         {c.public ? (
                           <>
                             {' '}
-                            <Badge tone="blue">Público</Badge>
+                            <Badge tone="blue">{t('Público', 'Public')}</Badge>
                           </>
                         ) : null}
                       </td>
@@ -101,10 +103,10 @@ export default function PromotionsPage() {
                         {can('promotions:write') ? (
                           <span className="row" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                             <Button size="sm" variant="ghost" onClick={() => void toggle(c)}>
-                              {c.active ? 'Desactivar' : 'Activar'}
+                              {c.active ? t('Desactivar', 'Deactivate') : t('Activar', 'Activate')}
                             </Button>
                             <Button size="sm" icon="edit" onClick={() => setEdit(c)}>
-                              Editar
+                              {t('Editar', 'Edit')}
                             </Button>
                           </span>
                         ) : null}

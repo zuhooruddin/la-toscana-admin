@@ -13,20 +13,22 @@ import { useAuth } from '@/lib/auth';
 import { useBranches } from '@/lib/branch';
 import { errorText } from '@/lib/format';
 import type { AdminBranch } from '@/lib/types';
+import { useT } from '@/lib/i18n';
 
 export default function RestaurantsPage() {
+  const t = useT();
   const { can } = useAuth();
   const { branches, loading, reload } = useBranches();
   const [creating, setCreating] = useState(false);
   return (
     <>
       <PageHeader
-        title="Restaurantes"
-        subtitle="Horarios, pedidos online, reparto, pagos y reservas de cada local"
+        title={t('Restaurantes', 'Restaurants')}
+        subtitle={t('Horarios, pedidos online, reparto, pagos y reservas de cada local', 'Hours, online orders, delivery, payments and reservations for each restaurant')}
         actions={
           can('branch:create') ? (
             <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>
-              Nuevo restaurante
+              {t('Nuevo restaurante', 'New restaurant')}
             </Button>
           ) : null
         }
@@ -41,7 +43,7 @@ export default function RestaurantsPage() {
               title={b.name}
               actions={
                 <Link href={`/restaurants/${b.id}`} className="btn btn-secondary btn-sm">
-                  <Icon name="edit" size={15} /> Configurar
+                  <Icon name="edit" size={15} /> {t('Configurar', 'Configure')}
                 </Link>
               }
             >
@@ -51,13 +53,13 @@ export default function RestaurantsPage() {
                 </p>
                 <div className="row">
                   {orderingBadge(b)}
-                  {b.published ? null : <Badge tone="grey">No publicado</Badge>}
-                  {b.reservations?.enabled ? <Badge tone="blue">Reservas online</Badge> : null}
-                  {b.services?.delivery ? <Badge tone="violet">Reparto</Badge> : null}
+                  {b.published ? null : <Badge tone="grey">{t('No publicado', 'Not published')}</Badge>}
+                  {b.reservations?.enabled ? <Badge tone="blue">{t('Reservas online', 'Online reservations')}</Badge> : null}
+                  {b.services?.delivery ? <Badge tone="violet">{t('Reparto', 'Delivery')}</Badge> : null}
                 </div>
                 <ReadinessList codes={b.readiness?.ordering ?? []} />
                 <div className="row-between">
-                  <span className="muted small">{b.contact?.phone ?? 'Sin teléfono'}</span>
+                  <span className="muted small">{b.contact?.phone ?? t('Sin teléfono', 'No phone')}</span>
                   <PauseControl branch={b} onChanged={reload} />
                 </div>
               </div>
@@ -71,6 +73,7 @@ export default function RestaurantsPage() {
 }
 
 function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const t = useT();
   const { toast } = useFeedback();
   const router = useRouter();
   const [name, setName] = useState('La Toscana ');
@@ -82,14 +85,14 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
   const [error, setError] = useState<string | null>(null);
   async function save() {
     const s = slug || slugify(name.replace(/^la toscana\s*/i, ''));
-    if (!name.trim() || !line1.trim() || !city.trim() || !/^[a-z0-9-]{2,40}$/.test(s)) return setError('Completa nombre, dirección y ciudad.');
+    if (!name.trim() || !line1.trim() || !city.trim() || !/^[a-z0-9-]{2,40}$/.test(s)) return setError(t('Completa nombre, dirección y ciudad.', 'Fill in name, address and city.'));
     setBusy(true);
     try {
       const r = await api<{ branch: AdminBranch }>('/api/v1/admin/branches', {
         method: 'POST',
         body: { slug: s, name: name.trim(), address: { line1: line1.trim(), city: city.trim(), postcode: postcode.trim() || undefined } },
       });
-      toast('Restaurante creado (sin publicar). Completa horario y contacto antes de activarlo.');
+      toast(t('Restaurante creado (sin publicar). Completa horario y contacto antes de activarlo.', 'Restaurant created (unpublished). Complete hours and contact details before enabling it.'));
       onCreated();
       router.push(`/restaurants/${r.branch.id}`);
     } catch (e) {
@@ -101,32 +104,32 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
     <Modal
       open
       onClose={onClose}
-      title="Nuevo restaurante"
+      title={t('Nuevo restaurante', 'New restaurant')}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="primary" loading={busy} onClick={() => void save()}>
-            Crear
+            {t('Crear', 'Create')}
           </Button>
         </>
       }
     >
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        <TextField label="Nombre" value={name} onChange={(e) => setName(e.target.value)} required />
+        <TextField label={t('Nombre', 'Name')} value={name} onChange={(e) => setName(e.target.value)} required />
         <TextField
-          label="Identificador (URL)"
+          label={t('Identificador (URL)', 'Identifier (URL)')}
           value={slug}
           placeholder={slugify(name.replace(/^la toscana\s*/i, ''))}
           onChange={(e) => setSlug(slugify(e.target.value))}
-          hint="Aparece en la web: /restaurantes/identificador"
+          hint={t('Aparece en la web: /restaurantes/identificador', 'Shown on the website: /restaurantes/identifier')}
         />
-        <TextField label="Dirección" value={line1} onChange={(e) => setLine1(e.target.value)} required />
+        <TextField label={t('Dirección', 'Address')} value={line1} onChange={(e) => setLine1(e.target.value)} required />
         <div className="grid-2">
-          <TextField label="Ciudad" value={city} onChange={(e) => setCity(e.target.value)} required />
-          <TextField label="Código postal" value={postcode} inputMode="numeric" maxLength={5} onChange={(e) => setPostcode(e.target.value)} />
+          <TextField label={t('Ciudad', 'City')} value={city} onChange={(e) => setCity(e.target.value)} required />
+          <TextField label={t('Código postal', 'Postcode')} value={postcode} inputMode="numeric" maxLength={5} onChange={(e) => setPostcode(e.target.value)} />
         </div>
       </div>
     </Modal>
