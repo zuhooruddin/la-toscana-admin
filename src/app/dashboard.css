@@ -1,0 +1,423 @@
+.dashboard {
+  display: grid;
+  gap: 16px;
+}
+.dashboard-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.dashboard-eyebrow {
+  color: var(--brand);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+.dashboard-heading h1 {
+  font-size: clamp(24px, 2.2vw, 34px);
+  letter-spacing: -0.04em;
+  margin-bottom: 4px;
+}
+.dashboard-date {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 205px;
+  padding: 10px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+}
+.dashboard-date strong,
+.dashboard-date small {
+  display: block;
+}
+.dashboard-date small {
+  color: var(--muted);
+}
+.dashboard-stats .stat {
+  min-height: 130px;
+  padding: 18px 16px;
+  align-items: flex-start;
+  gap: 18px;
+}
+.dashboard-stats .stat-ic {
+  width: 49px;
+  height: 49px;
+  border-radius: 19px;
+}
+.dashboard-stats .stat-value {
+  font-size: 26px;
+  line-height: 1.35;
+  color: #080d17;
+}
+.dashboard-stats .stat-label {
+  font-size: 12px;
+}
+.dashboard-stats .stat-hint {
+  margin-top: 8px;
+}
+.change {
+  color: #08a33c;
+  background: #e6f9ed;
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-weight: 700;
+}
+.change-down {
+  color: #d82732;
+  background: #fff0f1;
+}
+.comparison-label {
+  display: block;
+  margin-top: 3px;
+}
+.dashboard-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.dashboard .card {
+  border-radius: 12px;
+  box-shadow: 0 3px 18px #211a1004;
+}
+.dashboard .card-head h2 {
+  font-size: 16px;
+  letter-spacing: -0.025em;
+}
+.card-subtitle {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: 0;
+}
+.dashboard-view {
+  color: var(--brand);
+}
+.chart-range {
+  font-size: 12px;
+  width: auto;
+  padding: 6px 10px;
+}
+.sales-card {
+  min-height: 265px;
+}
+.sales-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 0 8px 12px;
+  font-size: 12px;
+}
+.sales-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sales-legend i,
+.chart-key i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff2635;
+  flex: none;
+}
+.sales-legend span:last-child i {
+  background: #ffb1b5;
+}
+.sales-plot {
+  display: flex;
+  height: 185px;
+  gap: 10px;
+  padding: 0 2px 12px;
+}
+.sales-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 44px;
+  padding-bottom: 22px;
+}
+.right-axis {
+  min-width: 18px;
+  text-align: right;
+}
+.sales-bars {
+  flex: 1;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 10px;
+  background: repeating-linear-gradient(to top, transparent 0, transparent calc(25% - 1px), #f0f0f0 calc(25% - 1px), #f0f0f0 25%);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 22px;
+}
+.sales-day {
+  position: relative;
+  min-width: 0;
+}
+.bar-pair {
+  height: 100%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 4px;
+}
+.bar-pair span {
+  width: 27%;
+  background: linear-gradient(#ff2635, #ff4954);
+  border-radius: 3px 3px 0 0;
+  min-width: 3px;
+}
+.bar-pair span:last-child {
+  background: linear-gradient(#ffafb4, #ffd2d4);
+}
+.sales-day small {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.restaurant-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+}
+.restaurant-photo {
+  width: 58px;
+  height: 48px;
+  border-radius: 8px;
+  background: #fff2e6;
+  color: #c77136;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.restaurant-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.restaurant-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+}
+.restaurant-name a {
+  color: var(--text);
+  font-weight: 750;
+  text-decoration: none;
+}
+.restaurant-name .badge {
+  font-size: 10px;
+  margin-top: 3px;
+}
+.restaurant-row .btn {
+  padding: 4px 6px;
+  font-size: 10px;
+}
+.recent-card .table-wrap {
+  padding: 0 16px 9px;
+}
+.recent-card .table th {
+  background: #f8f7f5;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.recent-card .table td {
+  font-size: 12px;
+  padding: 11px 6px;
+}
+.recent-card .table a {
+  color: var(--text);
+  text-decoration: none;
+}
+.customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.product-list {
+  display: grid;
+  gap: 13px;
+}
+.product-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.product-rank {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f5f4f2;
+  font-size: 12px;
+  flex: none;
+}
+.product-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: #fff2e6;
+  color: #b76824;
+  flex: none;
+}
+.product-detail {
+  flex: 1;
+  min-width: 0;
+}
+.product-detail > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.product-detail > div:first-child span {
+  color: #c70024;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.product-detail .bar {
+  height: 7px;
+  background: #f0f0f0;
+}
+.product-detail .bar span {
+  background: linear-gradient(90deg, #ff172d, #ff8a9c);
+}
+.product-detail small {
+  font-size: 10px;
+}
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 1fr 1fr;
+  gap: 16px;
+}
+.dashboard-bottom .card-head h2 {
+  font-size: 12px;
+}
+.distribution-body {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.donut {
+  width: 100px;
+  height: 100px;
+  flex: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.donut > div {
+  width: 70px;
+  height: 70px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.donut strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+.donut small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.chart-key {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+.chart-key > div {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 10px;
+}
+.chart-key span {
+  flex: 1;
+  color: var(--muted);
+}
+.dashboard-bottom .stat {
+  align-items: center;
+  min-height: 160px;
+}
+@media (max-width: 1300px) {
+  .dashboard-bottom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1000px) {
+  .dashboard-panels {
+    grid-template-columns: 1fr;
+  }
+  .sales-card {
+    order: 0;
+  }
+  .restaurants-card {
+    order: 2;
+  }
+  .recent-card {
+    order: 1;
+  }
+  .products-card {
+    order: 3;
+  }
+}
+@media (max-width: 600px) {
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .dashboard-date {
+    min-width: 0;
+    width: 100%;
+  }
+  .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .dashboard-stats .stat {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+  .dashboard-stats .stat-value {
+    font-size: 22px;
+  }
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+  .sales-bars {
+    gap: 3px;
+  }
+  .sales-day small {
+    font-size: 8px;
+  }
+  .sales-legend {
+    font-size: 10px;
+    gap: 10px;
+  }
+}

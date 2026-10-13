@@ -1270,3 +1270,141 @@ hr.sep {
     display: block;
   }
 }
+
+/* Reference dashboard shell */
+:root {
+  --brand: #ff2534;
+  --brand-strong: #df1426;
+  --bg: #f8f7f4;
+  --text: #10131b;
+  --muted: #717580;
+  --border: #ebe9e6;
+  --side-w: 235px;
+  --side-bg: #1a100b;
+  --side-text: #d1c9c3;
+  --side-muted: #a3978e;
+}
+.sidebar {
+  background: linear-gradient(150deg, #24150e, #170e0a 60%);
+  padding: 14px 12px;
+}
+.side-brand {
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 10px 10px;
+  text-align: center;
+}
+.brand-image {
+  width: 92px;
+  height: 60px;
+  object-fit: contain;
+}
+.side-brand small {
+  color: #b4aaa2;
+  font-size: 11px;
+}
+.side-link {
+  font-weight: 450;
+  padding: 8px 13px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.side-link[aria-current='page'] {
+  background: linear-gradient(110deg, #ff2635, #f41727);
+  box-shadow: 0 3px 10px #ff253426;
+}
+.side-section {
+  font-size: 10px;
+  font-weight: 450;
+  padding-top: 20px;
+  letter-spacing: 0.08em;
+}
+.nav-chevron {
+  margin-left: auto;
+}
+.side-profile strong,
+.side-profile small {
+  display: block;
+}
+.side-profile strong {
+  font-size: 12px;
+  color: white;
+}
+.side-profile small {
+  font-size: 10px;
+  color: #b4aaa2;
+}
+.avatar {
+  border-radius: 50%;
+  background: #646160;
+  color: white;
+  display: inline-grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  flex: none;
+  font-size: 12px;
+}
+.avatar-warm {
+  background: linear-gradient(135deg, #f4ab6b, #ed6b37);
+  width: 32px;
+  height: 32px;
+}
+.topbar {
+  gap: 22px;
+}
+.topbar .who {
+  text-align: left;
+  font-size: 13px;
+}
+.topbar-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  text-decoration: none;
+  background: #f8f7f6;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 12px;
+  width: min(440px, 34vw);
+  font-size: 12px;
+}
+.topbar-search span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.content {
+  padding: 18px 26px;
+  max-width: 1600px;
+}
+@media (max-width: 1150px) {
+  .topbar {
+    gap: 12px;
+  }
+  .topbar-search {
+    width: auto;
+    flex: 1;
+  }
+  .topbar-search span {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .content {
+    padding: 16px;
+  }
+  .topbar-search,
+  .topbar > .avatar {
+    display: none;
+  }
+  .topbar {
+    padding: 0 12px;
+  }
+  .topbar select.input {
+    min-width: 130px !important;
+    max-width: 165px;
+  }
+}

@@ -71,17 +71,15 @@ function isActive(pathname: string, href: string) {
 
 function Sidebar({ onNavigate }: { onNavigate: () => void }) {
   const pathname = usePathname() ?? '/';
-  const { can, logout } = useAuth();
+  const { me, can, logout } = useAuth();
   const { unseen } = useRealtime();
   const t = useT();
   return (
     <aside className="sidebar" aria-label={t('Navegación del panel', 'Panel navigation')}>
       <Link href="/" className="side-brand" onClick={onNavigate}>
-        <span className="logo" aria-hidden="true">
-          LT
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.webp" alt="La Toscana Pizzeria" className="brand-image" />
         <span>
-          <strong>La Toscana</strong>
           <small>{t('Panel de gestión', 'Admin panel')}</small>
         </span>
       </Link>
@@ -96,6 +94,7 @@ function Sidebar({ onNavigate }: { onNavigate: () => void }) {
                 <Link key={i.href} href={i.href} className="side-link" aria-current={isActive(pathname, i.href) ? 'page' : undefined} onClick={onNavigate}>
                   <Icon name={i.icon} />
                   {t(...i.label)}
+                  {group.section ? <Icon name="right" size={13} className="nav-chevron" /> : null}
                   {i.badge === 'orders' && unseen.length ? (
                     <span className="count" aria-label={t(`${unseen.length} pedidos nuevos`, `${unseen.length} new orders`)}>
                       {unseen.length}
@@ -109,8 +108,11 @@ function Sidebar({ onNavigate }: { onNavigate: () => void }) {
       </nav>
       <div className="side-foot">
         <Link href="/account" className="side-link" aria-current={pathname === '/account' ? 'page' : undefined} onClick={onNavigate}>
-          <Icon name="user" />
-          {t('Mi cuenta', 'My account')}
+          <span className="avatar avatar-warm">{(me?.name ?? 'A').slice(0, 2).toUpperCase()}</span>
+          <span className="side-profile">
+            <strong>{me?.name || t('Mi cuenta', 'My account')}</strong>
+            <small>{ROLE_LABEL[me?.role ?? ''] ?? me?.role}</small>
+          </span>
         </Link>
         <button type="button" className="side-link" style={{ border: 0, background: 'none', width: '100%', cursor: 'pointer' }} onClick={() => void logout()}>
           <Icon name="logout" />
@@ -150,6 +152,11 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
           {branches[0].name}
         </span>
       ) : null}
+      <Link href="/orders" className="topbar-search">
+        <Icon name="search" />
+        <span>{t('Buscar pedidos, clientes, productos…', 'Search orders, customers, products…')}</span>
+        <Icon name="right" size={14} />
+      </Link>
       <span className="spacer" />
       <span
         className="live-dot"
@@ -175,6 +182,13 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <Icon name="bell" />
       </button>
       <LangSwitch />
+      <span className="avatar">
+        {(me?.name ?? 'A')
+          .split(' ')
+          .map((part) => part[0])
+          .slice(0, 2)
+          .join('')}
+      </span>
       <div className="who">
         <strong>{me?.name || me?.email}</strong>
         <small>{ROLE_LABEL[me?.role ?? ''] ?? me?.role}</small>
