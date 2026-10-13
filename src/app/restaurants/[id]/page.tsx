@@ -11,11 +11,13 @@ import { errorText } from '@/lib/format';
 import type { AdminBranch } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
 import { DeliveryTab, GeneralTab, HoursTab, OrderingTab, ReservationsTab } from './sections';
+import { useT } from '@/lib/i18n';
 
 type Tab = 'general' | 'hours' | 'ordering' | 'delivery' | 'reservations';
 
 export default function RestaurantEditorPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useT();
   const { reload: reloadList } = useBranches();
   const r = useResource<{ branch: AdminBranch; readiness: { ordering: string[]; reservations: string[] } }>(`/api/v1/admin/branches/${id}`);
   const [tab, setTab] = useState<Tab>('general');
@@ -32,7 +34,7 @@ export default function RestaurantEditorPage() {
       <PageHeader
         back={
           <Link href="/restaurants" className="back-link">
-            <Icon name="left" size={15} /> Restaurantes
+            <Icon name="left" size={15} /> {t('Restaurantes', 'Restaurants')}
           </Link>
         }
         title={b.name}
@@ -46,11 +48,11 @@ export default function RestaurantEditorPage() {
         value={tab}
         onChange={setTab}
         tabs={[
-          { value: 'general', label: 'General y contacto' },
-          { value: 'hours', label: 'Horario' },
-          { value: 'ordering', label: 'Pedidos y pagos' },
-          { value: 'delivery', label: 'Reparto' },
-          { value: 'reservations', label: 'Reservas' },
+          { value: 'general', label: t('General y contacto', 'General & contact') },
+          { value: 'hours', label: t('Horario', 'Hours') },
+          { value: 'ordering', label: t('Pedidos y pagos', 'Orders & payments') },
+          { value: 'delivery', label: t('Reparto', 'Delivery') },
+          { value: 'reservations', label: t('Reservas', 'Reservations') },
         ]}
       />
       {tab === 'general' ? <GeneralTab key={`g${b.id}`} {...props} /> : null}

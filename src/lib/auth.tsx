@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api, ApiError, SESSION_EXPIRED_EVENT, setCsrfToken } from './api';
+import { tr } from './i18n';
 import type { Me, Role } from './types';
 
 type Status = 'loading' | 'anonymous' | 'ready';
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setCsrfToken(r.csrfToken);
       if (!STAFF_ROLES.includes(r.user.role)) {
         await api('/api/v1/auth/logout', { method: 'POST', body: {} }).catch(() => undefined);
-        throw new ApiError(403, 'NOT_STAFF', 'Esta cuenta no tiene acceso al panel de gestión.');
+        throw new ApiError(403, 'NOT_STAFF', tr('Esta cuenta no tiene acceso al panel de gestión.', 'This account does not have access to the admin panel.'));
       }
       await reload();
       return r.user;

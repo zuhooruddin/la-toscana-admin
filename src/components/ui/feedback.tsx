@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
+import { useT } from '@/lib/i18n';
 import { Icon } from './Icon';
 import { Button, Modal } from './kit';
 
@@ -25,6 +26,7 @@ const FeedbackContext = createContext<{
 } | null>(null);
 
 export function FeedbackProvider({ children }: { children: ReactNode }) {
+  const tt = useT();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [pending, setPending] = useState<ConfirmOptions | null>(null);
   const [typed, setTyped] = useState('');
@@ -70,14 +72,14 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
         footer={
           <>
             <Button variant="ghost" onClick={() => close(false)}>
-              Cancelar
+              {tt('Cancelar', 'Cancel')}
             </Button>
             <Button
               variant={pending?.danger ? 'danger' : 'primary'}
               disabled={Boolean(pending?.typeToConfirm) && typed !== pending?.typeToConfirm}
               onClick={() => close(true)}
             >
-              {pending?.confirmLabel ?? 'Confirmar'}
+              {pending?.confirmLabel ?? tt('Confirmar', 'Confirm')}
             </Button>
           </>
         }
@@ -87,7 +89,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
           {pending?.typeToConfirm ? (
             <label className="field">
               <span>
-                Escribe <strong>{pending.typeToConfirm}</strong> para confirmar
+                {tt('Escribe', 'Type')} <strong>{pending.typeToConfirm}</strong> {tt('para confirmar', 'to confirm')}
               </span>
               <input className="input" value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus />
             </label>

@@ -24,15 +24,17 @@ import {
 import { useRealtime, useRealtimeEvent } from '@/lib/realtime';
 import type { AdminOrder } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
-const COLUMNS: { status: string; title: string }[] = [
-  { status: 'confirmed', title: 'Nuevos' },
-  { status: 'preparing', title: 'En preparación' },
-  { status: 'ready', title: 'Listos' },
-  { status: 'out_for_delivery', title: 'En reparto' },
+const COLUMNS: { status: string; title: [string, string] }[] = [
+  { status: 'confirmed', title: ['Nuevos', 'New'] },
+  { status: 'preparing', title: ['En preparación', 'Preparing'] },
+  { status: 'ready', title: ['Listos', 'Ready'] },
+  { status: 'out_for_delivery', title: ['En reparto', 'Out for delivery'] },
 ];
 
 function Board() {
+  const t = useT();
   const router = useRouter();
   const { can } = useAuth();
   const { branchParam, byId, branches } = useBranches();
@@ -69,13 +71,13 @@ function Board() {
         return (
           <section key={c.status} className="board-col" aria-labelledby={`col-${c.status}`}>
             <header className="board-col-head">
-              <span id={`col-${c.status}`}>{c.title}</span>
+              <span id={`col-${c.status}`}>{t(...c.title)}</span>
               <Badge tone={STATUS_TONE[c.status]}>{list.length}</Badge>
             </header>
             <div className="board-col-body">
               {list.length === 0 ? (
                 <p className="muted small" style={{ padding: 8 }}>
-                  Sin pedidos
+                  {t('Sin pedidos', 'No orders')}
                 </p>
               ) : null}
               {list.map((o) => {
@@ -87,9 +89,9 @@ function Board() {
                       <span className="muted small">{o.fulfilment.scheduledFor ? `⏰ ${formatTime(o.fulfilment.scheduledFor)}` : minutesAgo(o.createdAt)}</span>
                     </div>
                     <div className="row" style={{ gap: 6 }}>
-                      <Badge tone={o.fulfilment.type === 'delivery' ? 'violet' : 'blue'}>{o.fulfilment.type === 'delivery' ? 'Reparto' : 'Recogida'}</Badge>
+                      <Badge tone={o.fulfilment.type === 'delivery' ? 'violet' : 'blue'}>{o.fulfilment.type === 'delivery' ? t('Reparto', 'Delivery') : t('Recogida', 'Pickup')}</Badge>
                       <Badge tone={o.payment.status === 'paid' ? 'green' : 'grey'}>
-                        {o.payment.method === 'cash' ? 'Efectivo' : 'Tarjeta'} · {PAYMENT_LABEL[o.payment.status] ?? o.payment.status}
+                        {o.payment.method === 'cash' ? t('Efectivo', 'Cash') : t('Tarjeta', 'Card')} · {PAYMENT_LABEL[o.payment.status] ?? o.payment.status}
                       </Badge>
                       {branches.length > 1 ? <span className="muted small">{byId(o.branchId)?.name.replace('La Toscana ', '')}</span> : null}
                     </div>
@@ -100,7 +102,7 @@ function Board() {
                           {l.options.length ? ` (${l.options.map((x) => x.choiceName).join(', ')})` : ''}
                         </span>
                       ))}
-                      {o.lines.length > 4 ? <span>+{o.lines.length - 4} más…</span> : null}
+                      {o.lines.length > 4 ? <span>+{o.lines.length - 4} {t('más…', 'more…')}</span> : null}
                     </div>
                     {o.notes ? (
                       <p className="small" style={{ color: 'var(--amber)' }}>
@@ -136,6 +138,7 @@ function Board() {
 
 function History() {
   const { branchParam, byId } = useBranches();
+  const t = useT();
   const [status, setStatus] = useState('');
   const [from, setFrom] = useState(todayLocal(-6));
   const [to, setTo] = useState(todayLocal());
@@ -149,8 +152,8 @@ function History() {
   return (
     <Card padded={false}>
       <div className="filters" style={{ padding: '14px 14px 0' }}>
-        <select className="input" aria-label="Estado" value={status} onChange={(e) => (setStatus(e.target.value), setPage(1))}>
-          <option value="">Todos los estados</option>
+        <select className="input" aria-label={t('Estado', 'Status')} value={status} onChange={(e) => (setStatus(e.target.value), setPage(1))}>
+          <option value="">{t('Todos los estados', 'All statuses')}</option>
           {['confirmed', 'preparing', 'ready', 'out_for_delivery', 'picked_up', 'delivered', 'cancelled', 'refunded', 'pending_payment'].map((s) => (
             <option key={s} value={s}>
               {STATUS_LABEL[s]}
@@ -158,29 +161,29 @@ function History() {
           ))}
         </select>
         <label className="row small">
-          Desde <input className="input" type="date" value={from} onChange={(e) => (setFrom(e.target.value), setPage(1))} />
+          {t('Desde', 'From')} <input className="input" type="date" value={from} onChange={(e) => (setFrom(e.target.value), setPage(1))} />
         </label>
         <label className="row small">
-          Hasta <input className="input" type="date" value={to} onChange={(e) => (setTo(e.target.value), setPage(1))} />
+          {t('Hasta', 'To')} <input className="input" type="date" value={to} onChange={(e) => (setTo(e.target.value), setPage(1))} />
         </label>
       </div>
       {!data ? (
         <Spinner />
       ) : data.items.length === 0 ? (
-        <Empty icon="orders" title="No hay pedidos con estos filtros" />
+        <Empty icon="orders" title={t('No hay pedidos con estos filtros', 'No orders match these filters')} />
       ) : (
         <>
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Pedido</th>
-                  <th>Fecha</th>
-                  <th>Cliente</th>
-                  <th>Restaurante</th>
-                  <th>Tipo</th>
-                  <th>Pago</th>
-                  <th>Estado</th>
+                  <th>{t('Pedido', 'Order')}</th>
+                  <th>{t('Fecha', 'Date')}</th>
+                  <th>{t('Cliente', 'Customer')}</th>
+                  <th>{t('Restaurante', 'Restaurant')}</th>
+                  <th>{t('Tipo', 'Type')}</th>
+                  <th>{t('Pago', 'Payment')}</th>
+                  <th>{t('Estado', 'Status')}</th>
                   <th className="num">Total</th>
                 </tr>
               </thead>
@@ -195,13 +198,13 @@ function History() {
                     <td className="mono">{formatDateTime(o.createdAt)}</td>
                     <td>{o.customer?.name ?? '—'}</td>
                     <td>{byId(o.branchId)?.name ?? o.branchName}</td>
-                    <td>{o.fulfilment.type === 'delivery' ? 'Reparto' : 'Recogida'}</td>
+                    <td>{o.fulfilment.type === 'delivery' ? t('Reparto', 'Delivery') : t('Recogida', 'Pickup')}</td>
                     <td>
-                      {o.payment.method === 'cash' ? 'Efectivo' : 'Tarjeta'}
+                      {o.payment.method === 'cash' ? t('Efectivo', 'Cash') : t('Tarjeta', 'Card')}
                       {o.payment.simulated ? (
                         <>
                           {' '}
-                          <Badge tone="amber">Simulado</Badge>
+                          <Badge tone="amber">{t('Simulado', 'Simulated')}</Badge>
                         </>
                       ) : null}
                     </td>
@@ -222,16 +225,17 @@ function History() {
 }
 
 export default function OrdersPage() {
+  const t = useT();
   const [tab, setTab] = useState<'board' | 'history'>('board');
   return (
     <>
-      <PageHeader title="Pedidos" subtitle="Los pedidos nuevos llegan en directo desde la web y la app." />
+      <PageHeader title={t('Pedidos', 'Orders')} subtitle={t('Los pedidos nuevos llegan en directo desde la web y la app.', 'New orders arrive live from the website and app.')} />
       <Tabs
         value={tab}
         onChange={setTab}
         tabs={[
-          { value: 'board', label: 'Cocina (en curso)' },
-          { value: 'history', label: 'Historial' },
+          { value: 'board', label: t('Cocina (en curso)', 'Kitchen (active)') },
+          { value: 'history', label: t('Historial', 'History') },
         ]}
       />
       {tab === 'board' ? <Board /> : <History />}

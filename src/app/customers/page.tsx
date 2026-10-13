@@ -6,6 +6,7 @@ import { Alert, Badge, Card, Empty, PageHeader, Pagination, SearchInput, Spinner
 import { qs } from '@/lib/api';
 import { errorText, formatDate, formatEur } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 export interface CustomerSummary {
   id: string;
@@ -20,6 +21,7 @@ export interface CustomerSummary {
 }
 
 export default function CustomersPage() {
+  const tt = useT();
   const [q, setQ] = useState('');
   const [debounced, setDebounced] = useState('');
   const [status, setStatus] = useState('');
@@ -34,34 +36,34 @@ export default function CustomersPage() {
   const data = r.data ?? r.stale;
   return (
     <>
-      <PageHeader title="Clientes" subtitle="Cuentas registradas en la web y la app. Los pedidos como invitado no crean cuenta." />
+      <PageHeader title={tt('Clientes', 'Customers')} subtitle={tt('Cuentas registradas en la web y la app. Los pedidos como invitado no crean cuenta.', 'Accounts registered on the website and app. Guest orders do not create an account.')} />
       {r.error ? <Alert tone="danger">{errorText(r.error)}</Alert> : null}
       <Card padded={false}>
         <div className="filters" style={{ padding: '14px 14px 0' }}>
-          <SearchInput value={q} onChange={setQ} placeholder="Nombre, correo o teléfono…" />
-          <select className="input" aria-label="Estado" value={status} onChange={(e) => (setStatus(e.target.value), setPage(1))}>
-            <option value="">Todos</option>
-            <option value="active">Activos</option>
-            <option value="disabled">Bloqueados</option>
+          <SearchInput value={q} onChange={setQ} placeholder={tt('Nombre, correo o teléfono…', 'Name, email or phone…')} />
+          <select className="input" aria-label={tt('Estado', 'Status')} value={status} onChange={(e) => (setStatus(e.target.value), setPage(1))}>
+            <option value="">{tt('Todos', 'All')}</option>
+            <option value="active">{tt('Activos', 'Active')}</option>
+            <option value="disabled">{tt('Bloqueados', 'Blocked')}</option>
           </select>
         </div>
         {!data ? (
           <Spinner />
         ) : data.items.length === 0 ? (
-          <Empty icon="users" title="No hay clientes con estos filtros" />
+          <Empty icon="users" title={tt('No hay clientes con estos filtros', 'No customers match these filters')} />
         ) : (
           <>
             <div className="table-wrap">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th className="num">Pedidos</th>
-                    <th className="num">Gastado</th>
-                    <th>Último pedido</th>
-                    <th>Alta</th>
-                    <th>Estado</th>
+                    <th>{tt('Cliente', 'Customer')}</th>
+                    <th>{tt('Teléfono', 'Phone')}</th>
+                    <th className="num">{tt('Pedidos', 'Orders')}</th>
+                    <th className="num">{tt('Gastado', 'Spent')}</th>
+                    <th>{tt('Último pedido', 'Last order')}</th>
+                    <th>{tt('Alta', 'Joined')}</th>
+                    <th>{tt('Estado', 'Status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -69,7 +71,7 @@ export default function CustomersPage() {
                     <tr key={c.id}>
                       <td>
                         <Link href={`/customers/${c.id}`}>
-                          <strong>{c.name ?? 'Sin nombre'}</strong>
+                          <strong>{c.name ?? tt('Sin nombre', 'No name')}</strong>
                         </Link>
                         <div className="muted small">{c.email}</div>
                       </td>
@@ -79,11 +81,11 @@ export default function CustomersPage() {
                       <td>{formatDate(c.orders.lastAt)}</td>
                       <td>{formatDate(c.createdAt)}</td>
                       <td>
-                        {c.status === 'active' ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Bloqueado</Badge>}
+                        {c.status === 'active' ? <Badge tone="green">{tt('Activo', 'Active')}</Badge> : <Badge tone="red">{tt('Bloqueado', 'Blocked')}</Badge>}
                         {c.marketingConsent ? (
                           <>
                             {' '}
-                            <Badge tone="blue">Acepta promociones</Badge>
+                            <Badge tone="blue">{tt('Acepta promociones', 'Accepts promotions')}</Badge>
                           </>
                         ) : null}
                       </td>

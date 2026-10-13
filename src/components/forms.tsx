@@ -4,6 +4,7 @@ import { useId, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { config } from '@/lib/config';
 import { centsToInput, errorText, formatEur, parseEur } from '@/lib/format';
+import { useT } from '@/lib/i18n';
 import type { Choice, Loc, OptionGroup } from '@/lib/types';
 import { Icon } from './ui/Icon';
 import { Button, Field } from './ui/kit';
@@ -40,6 +41,7 @@ export function LocInput({
   hint?: string;
   error?: string | null;
 }) {
+  const t = useT();
   const id = useId();
   const v = value ?? {};
   const Input = multiline ? 'textarea' : 'input';
@@ -47,7 +49,7 @@ export function LocInput({
     <Field label={label} hint={hint} error={error} htmlFor={`${id}-es`} required={required}>
       <div className="grid-2" style={{ gap: 8 }}>
         <div className="field" style={{ gap: 2 }}>
-          <span className="muted small">Español</span>
+          <span className="muted small">{t('Español', 'Spanish')}</span>
           <Input
             id={`${id}-es`}
             className="input"
@@ -58,7 +60,7 @@ export function LocInput({
           />
         </div>
         <div className="field" style={{ gap: 2 }}>
-          <span className="muted small">English (opcional)</span>
+          <span className="muted small">{t('Inglés (opcional)', 'English (optional)')}</span>
           <Input
             id={`${id}-en`}
             aria-label={`${label} (English)`}
@@ -87,18 +89,19 @@ export function MoneyInput({
   allowNegative?: boolean;
   hint?: string;
 }) {
+  const t = useT();
   const id = useId();
   const [text, setText] = useState(centsToInput(Math.abs(cents)));
   const [neg, setNeg] = useState(cents < 0);
   const parsed = parseEur(text);
   return (
-    <Field label={label} htmlFor={id} hint={hint} error={parsed === null ? 'Importe no válido (ej. 12,50)' : null}>
+    <Field label={label} htmlFor={id} hint={hint} error={parsed === null ? t('Importe no válido (ej. 12,50)', 'Invalid amount (e.g. 12.50)') : null}>
       <div className="row" style={{ flexWrap: 'nowrap' }}>
         {allowNegative ? (
           <select
             className="input"
             style={{ width: 70 }}
-            aria-label="Signo"
+            aria-label={t('Signo', 'Sign')}
             value={neg ? '-' : '+'}
             onChange={(e) => {
               const n = e.target.value === '-';
@@ -142,14 +145,15 @@ export function ImageInput({
   purpose?: 'menu' | 'banner' | 'logo' | 'page';
   hint?: string;
 }) {
+  const t = useT();
   const ref = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const src = imageSrc(value);
   async function upload(file: File) {
     setError(null);
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return setError('Solo imágenes JPG, PNG o WebP.');
-    if (file.size > 8 * 1024 * 1024) return setError('La imagen supera 8 MB.');
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return setError(t('Solo imágenes JPG, PNG o WebP.', 'Only JPG, PNG or WebP images.'));
+    if (file.size > 8 * 1024 * 1024) return setError(t('La imagen supera 8 MB.', 'The image exceeds 8 MB.'));
     setBusy(true);
     try {
       const form = new FormData();
@@ -183,11 +187,11 @@ export function ImageInput({
             onChange={(e) => e.target.files?.[0] && void upload(e.target.files[0])}
           />
           <Button size="sm" icon="upload" loading={busy} onClick={() => ref.current?.click()}>
-            {src ? 'Cambiar imagen' : 'Subir imagen'}
+            {src ? t('Cambiar imagen', 'Change image') : t('Subir imagen', 'Upload image')}
           </Button>
           {src ? (
             <Button size="sm" variant="ghost" icon="trash" onClick={() => onChange(null)}>
-              Quitar
+              {t('Quitar', 'Remove')}
             </Button>
           ) : null}
         </div>
@@ -208,52 +212,53 @@ export function GroupEditor({
   onRemove?: () => void;
   lockKey?: boolean;
 }) {
+  const t = useT();
   const set = (patch: Partial<OptionGroup>) => onChange({ ...group, ...patch });
   const setChoice = (i: number, patch: Partial<Choice>) => set({ choices: group.choices.map((c, j) => (j === i ? { ...c, ...patch } : c)) });
-  const invalid = group.min > group.max ? 'El mínimo no puede ser mayor que el máximo' : null;
+  const invalid = group.min > group.max ? t('El mínimo no puede ser mayor que el máximo', 'The minimum cannot be greater than the maximum') : null;
   return (
     <div className="card" style={{ background: 'var(--surface-2)' }}>
       <div className="stack">
         <div className="row-between">
-          <strong>{group.name.es || 'Nuevo grupo'}</strong>
+          <strong>{group.name.es || t('Nuevo grupo', 'New group')}</strong>
           {onRemove ? (
             <Button size="sm" variant="ghost" icon="trash" onClick={onRemove}>
-              Quitar grupo
+              {t('Quitar grupo', 'Remove group')}
             </Button>
           ) : null}
         </div>
         <LocInput
-          label="Nombre del grupo"
+          label={t('Nombre del grupo', 'Group name')}
           value={group.name}
           onChange={(name) => set({ name, ...(lockKey || group.key ? {} : { key: slugify(name.es ?? '') }) })}
           required
           maxLength={80}
         />
         <div className="grid-3">
-          <Field label="Clave interna" hint="Minúsculas y guiones; no se puede cambiar después.">
+          <Field label={t('Clave interna', 'Internal key')} hint={t('Minúsculas y guiones; no se puede cambiar después.', 'Lowercase and hyphens; cannot be changed later.')}>
             <input className="input" value={group.key} disabled={lockKey} onChange={(e) => set({ key: slugify(e.target.value) })} />
           </Field>
-          <Field label="Mínimo a elegir" error={invalid}>
+          <Field label={t('Mínimo a elegir', 'Minimum to choose')} error={invalid}>
             <input className="input" type="number" min={0} max={20} value={group.min} onChange={(e) => set({ min: Math.max(0, Number(e.target.value)) })} />
           </Field>
-          <Field label="Máximo a elegir">
+          <Field label={t('Máximo a elegir', 'Maximum to choose')}>
             <input className="input" type="number" min={1} max={20} value={group.max} onChange={(e) => set({ max: Math.max(1, Number(e.target.value)) })} />
           </Field>
         </div>
         <label className="checkbox">
           <input type="checkbox" checked={group.published !== false} onChange={(e) => set({ published: e.target.checked })} />
-          Visible para los clientes
+          {t('Visible para los clientes', 'Visible to customers')}
         </label>
-        <p className="section-title">Opciones ({group.choices.length})</p>
+        <p className="section-title">{t('Opciones', 'Options')} ({group.choices.length})</p>
         <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
-                <th>Nombre (es)</th>
-                <th>Nombre (en)</th>
-                <th>Precio extra</th>
-                <th>Disponible</th>
-                <th aria-label="Acciones" />
+                <th>{t('Nombre (es)', 'Name (es)')}</th>
+                <th>{t('Nombre (en)', 'Name (en)')}</th>
+                <th>{t('Precio extra', 'Extra price')}</th>
+                <th>{t('Disponible', 'Available')}</th>
+                <th aria-label={t('Acciones', 'Actions')} />
               </tr>
             </thead>
             <tbody>
@@ -262,7 +267,7 @@ export function GroupEditor({
                   <td>
                     <input
                       className="input"
-                      aria-label="Nombre en español"
+                      aria-label={t('Nombre en español', 'Name in Spanish')}
                       value={c.name.es ?? ''}
                       onChange={(e) => setChoice(i, { name: { ...c.name, es: e.target.value }, ...(c.key ? {} : { key: slugify(e.target.value) }) })}
                     />
@@ -270,7 +275,7 @@ export function GroupEditor({
                   <td>
                     <input
                       className="input"
-                      aria-label="Nombre en inglés"
+                      aria-label={t('Nombre en inglés', 'Name in English')}
                       value={c.name.en ?? ''}
                       onChange={(e) => setChoice(i, { name: { ...c.name, en: e.target.value } })}
                     />
@@ -281,7 +286,7 @@ export function GroupEditor({
                   <td>
                     <input
                       type="checkbox"
-                      aria-label="Disponible"
+                      aria-label={t('Disponible', 'Available')}
                       checked={c.available !== false && c.status !== 'draft'}
                       onChange={(e) => setChoice(i, { available: e.target.checked, status: 'active' })}
                     />
@@ -290,7 +295,7 @@ export function GroupEditor({
                     <button
                       type="button"
                       className="icon-btn"
-                      aria-label={`Quitar ${c.name.es}`}
+                      aria-label={`${t('Quitar', 'Remove')} ${c.name.es}`}
                       onClick={() => set({ choices: group.choices.filter((_, j) => j !== i) })}
                     >
                       <Icon name="trash" size={16} />
@@ -307,7 +312,7 @@ export function GroupEditor({
             icon="plus"
             onClick={() => set({ choices: [...group.choices, { key: '', name: { es: '' }, priceDeltaCents: 0, available: true, status: 'active' }] })}
           >
-            Añadir opción
+            {t('Añadir opción', 'Add option')}
           </Button>
         </div>
       </div>
@@ -316,15 +321,16 @@ export function GroupEditor({
 }
 
 function ChoicePrice({ cents, onChange }: { cents: number; onChange: (c: number) => void }) {
+  const t = useT();
   const [text, setText] = useState(centsToInput(cents));
   const p = parseEur(text);
   return (
     <input
       className="input"
-      aria-label="Precio extra en euros"
+      aria-label={t('Precio extra en euros', 'Extra price in euros')}
       inputMode="decimal"
       value={text}
-      title={p === null ? 'Importe no válido' : formatEur(p)}
+      title={p === null ? t('Importe no válido', 'Invalid amount') : formatEur(p)}
       aria-invalid={p === null ? true : undefined}
       onChange={(e) => {
         setText(e.target.value);

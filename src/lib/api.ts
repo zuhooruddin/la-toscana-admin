@@ -1,6 +1,7 @@
 'use client';
 
 import { config } from './config';
+import { tr } from './i18n';
 
 export class ApiError extends Error {
   constructor(
@@ -35,6 +36,37 @@ export const setCsrfToken = (t: string | undefined) => {
   if (t) csrfToken = t;
 };
 
+let refreshing: Promise<boolean> | null = null;
+
+/**
+ * One refresh at a time. Refresh tokens rotate and the API revokes the whole session when a rotated token is used
+ * again, so parallel 401s (a page loading several resources, or several dashboard tabs) must share a single refresh.
+ * `csrfSeen` is the CSRF cookie the failed request was sent with: the API re-issues it on every refresh, so a
+ * different value means another tab has already refreshed and the request only needs a retry.
+ */
+function refreshSession(csrfSeen: string | null): Promise<boolean> {
+  refreshing ??= (async () => {
+    const run = async () => {
+      const current = readCookie('lt_csrf');
+      if (csrfSeen && current && current !== csrfSeen) return true;
+      const r = await fetch(`${config.apiUrl}/api/v1/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json', 'x-csrf-token': await ensureCsrf() },
+        body: JSON.stringify({ client: 'web' }),
+      }).catch(() => null);
+      if (!r?.ok) return false;
+      setCsrfToken(((await r.json().catch(() => ({}))) as { csrfToken?: string }).csrfToken);
+      return true;
+    };
+    const locks = typeof navigator !== 'undefined' ? navigator.locks : undefined;
+    return locks ? locks.request('lt-admin-session-refresh', run) : run();
+  })().finally(() => {
+    refreshing = null;
+  });
+  return refreshing;
+}
+
 /** Fired when the session is gone (refresh failed) so the shell can send the user to the login page. */
 export const SESSION_EXPIRED_EVENT = 'lt-admin:session-expired';
 
@@ -57,6 +89,7 @@ export async function api<T>(path: string, opts: ApiOptions = {}, retried = fals
   if (opts.body !== undefined) headers['content-type'] = 'application/json';
   if (method !== 'GET') headers['x-csrf-token'] = await ensureCsrf();
   if (opts.idempotencyKey) headers['idempotency-key'] = opts.idempotencyKey;
+  const csrfSeen = readCookie('lt_csrf');
 
   let r: Response;
   try {
@@ -69,20 +102,11 @@ export async function api<T>(path: string, opts: ApiOptions = {}, retried = fals
     });
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw e;
-    throw new ApiError(0, 'NETWORK', 'No se ha podido conectar con el servidor. Comprueba tu conexión.');
+    throw new ApiError(0, 'NETWORK', tr('No se ha podido conectar con el servidor. Comprueba tu conexión.', 'Could not connect to the server. Check your connection.'));
   }
 
   if (r.status === 401 && !retried && !path.startsWith('/api/v1/auth/login')) {
-    const refreshed = await fetch(`${config.apiUrl}/api/v1/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'content-type': 'application/json', 'x-csrf-token': await ensureCsrf() },
-      body: JSON.stringify({ client: 'web' }),
-    }).catch(() => null);
-    if (refreshed?.ok) {
-      setCsrfToken(((await refreshed.json()) as { csrfToken?: string }).csrfToken);
-      return api<T>(path, opts, true);
-    }
+    if (await refreshSession(csrfSeen)) return api<T>(path, opts, true);
     if (typeof window !== 'undefined' && !path.startsWith('/api/v1/auth/me')) window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
   }
   const text = await r.text();

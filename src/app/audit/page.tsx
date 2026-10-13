@@ -5,6 +5,7 @@ import { Alert, Button, Card, Empty, PageHeader, Spinner } from '@/components/ui
 import { qs } from '@/lib/api';
 import { errorText, formatDateTime, ROLE_LABEL } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 interface Entry {
   _id: string;
@@ -35,16 +36,17 @@ const ENTITIES = [
 
 /** Who changed what and when. Read-only by design. */
 export default function AuditPage() {
+  const t = useT();
   const [entity, setEntity] = useState('');
   const [page, setPage] = useState(1);
   const r = useResource<{ items: Entry[] }>(`/api/v1/admin/audit${qs({ entity, page })}`);
   const items = (r.data ?? r.stale)?.items ?? [];
   return (
     <>
-      <PageHeader title="Registro de actividad" subtitle="Cambios hechos en el panel, la web y las apps. No se puede modificar." />
+      <PageHeader title={t('Registro de actividad', 'Activity log')} subtitle={t('Cambios hechos en el panel, la web y las apps. No se puede modificar.', 'Changes made in the panel, website and apps. It cannot be edited.')} />
       <div className="filters">
-        <select className="input" aria-label="Tipo" value={entity} onChange={(e) => (setEntity(e.target.value), setPage(1))}>
-          <option value="">Todo</option>
+        <select className="input" aria-label={t('Tipo', 'Type')} value={entity} onChange={(e) => (setEntity(e.target.value), setPage(1))}>
+          <option value="">{t('Todo', 'All')}</option>
           {ENTITIES.map((e) => (
             <option key={e} value={e}>
               {e}
@@ -57,17 +59,17 @@ export default function AuditPage() {
         {r.loading && !r.stale ? (
           <Spinner />
         ) : items.length === 0 ? (
-          <Empty icon="history" title="Sin actividad" />
+          <Empty icon="history" title={t('Sin actividad', 'No activity')} />
         ) : (
           <>
             <div className="table-wrap">
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Fecha</th>
-                    <th>Quién</th>
-                    <th>Acción</th>
-                    <th>Elemento</th>
+                    <th>{t('Fecha', 'Date')}</th>
+                    <th>{t('Quién', 'Who')}</th>
+                    <th>{t('Acción', 'Action')}</th>
+                    <th>{t('Elemento', 'Item')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -75,7 +77,7 @@ export default function AuditPage() {
                     <tr key={e._id}>
                       <td className="mono small">{formatDateTime(e.at)}</td>
                       <td>
-                        {e.actorId?.name ?? e.actorId?.email ?? (e.actorRole === 'system' ? 'Sistema' : '—')}
+                        {e.actorId?.name ?? e.actorId?.email ?? (e.actorRole === 'system' ? t('Sistema', 'System') : '—')}
                         <div className="muted small">{ROLE_LABEL[e.actorId?.role ?? e.actorRole ?? ''] ?? e.actorRole}</div>
                       </td>
                       <td className="mono small">{e.action}</td>
@@ -90,11 +92,11 @@ export default function AuditPage() {
             </div>
             <div className="pagination">
               <Button size="sm" variant="ghost" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Anterior
+                {t('Anterior', 'Previous')}
               </Button>
-              <span className="muted">Página {page}</span>
+              <span className="muted">{t('Página', 'Page')} {page}</span>
               <Button size="sm" variant="ghost" disabled={items.length < 50} onClick={() => setPage(page + 1)}>
-                Siguiente
+                {t('Siguiente', 'Next')}
               </Button>
             </div>
           </>

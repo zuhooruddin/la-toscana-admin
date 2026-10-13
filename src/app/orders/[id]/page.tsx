@@ -26,9 +26,11 @@ import {
 import { useRealtime, useRealtimeEvent } from '@/lib/realtime';
 import type { AdminOrder } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useT();
   const { can } = useAuth();
   const { byId } = useBranches();
   const { markSeen } = useRealtime();
@@ -64,7 +66,7 @@ export default function OrderDetailPage() {
     setBusy(to);
     try {
       await api(`/api/v1/admin/orders/${id}/status`, { method: 'POST', body: { status: to, note } });
-      toast(`Pedido ${o!.number}: ${STATUS_LABEL[to]}`);
+      toast(`${t('Pedido', 'Order')} ${o!.number}: ${STATUS_LABEL[to]}`);
       setCancelOpen(false);
       r.reload();
     } catch (e) {
@@ -79,10 +81,10 @@ export default function OrderDetailPage() {
       <PageHeader
         back={
           <Link href="/orders" className="back-link">
-            <Icon name="left" size={15} /> Pedidos
+            <Icon name="left" size={15} /> {t('Pedidos', 'Orders')}
           </Link>
         }
-        title={`Pedido ${o.number}`}
+        title={`${t('Pedido', 'Order')} ${o.number}`}
         subtitle={
           <>
             {byId(o.branchId)?.name ?? o.branchName} · {formatDateTime(o.createdAt)}
@@ -91,16 +93,16 @@ export default function OrderDetailPage() {
         actions={
           <>
             <a className="btn btn-secondary btn-md" href={`${config.apiUrl}/api/v1/admin/orders/${o.id}/ticket`} target="_blank" rel="noopener noreferrer">
-              <Icon name="print" /> Ticket de cocina
+              <Icon name="print" /> {t('Ticket de cocina', 'Kitchen ticket')}
             </a>
             {can('orders:update') && canCancel ? (
               <Button variant="ghost" onClick={() => setCancelOpen(true)}>
-                Cancelar pedido
+                {t('Cancelar pedido', 'Cancel order')}
               </Button>
             ) : null}
             {canRefund ? (
               <Button onClick={() => setRefundOpen(true)} icon="euro">
-                Reembolsar
+                {t('Reembolsar', 'Refund')}
               </Button>
             ) : null}
             {can('orders:update')
@@ -115,12 +117,12 @@ export default function OrderDetailPage() {
       />
       {o.payment.simulated ? (
         <div style={{ marginBottom: 16 }}>
-          <Alert tone="warning">Pago con tarjeta simulado (modo de pruebas): no se ha cobrado dinero real.</Alert>
+          <Alert tone="warning">{t('Pago con tarjeta simulado (modo de pruebas): no se ha cobrado dinero real.', 'Simulated card payment (test mode): no real money was charged.')}</Alert>
         </div>
       ) : null}
       <div className="grid-2" style={{ gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr)', alignItems: 'start' }}>
         <div className="stack">
-          <Card title="Productos">
+          <Card title={t('Productos', 'Items')}>
             <ul className="line-list">
               {o.lines.map((l, i) => (
                 <li key={i}>
@@ -135,7 +137,7 @@ export default function OrderDetailPage() {
                     ) : null}
                     {l.notes ? (
                       <div className="small" style={{ color: 'var(--amber)' }}>
-                        Nota: {l.notes}
+                        {t('Nota', 'Note')}: {l.notes}
                       </div>
                     ) : null}
                     {l.warnings?.map((w) => (
@@ -150,36 +152,39 @@ export default function OrderDetailPage() {
             </ul>
             <hr className="sep" />
             <dl className="kv" style={{ gridTemplateColumns: '1fr auto' }}>
-              <dt>Subtotal</dt>
+              <dt>{t('Subtotal', 'Subtotal')}</dt>
               <dd className="mono">{formatEur(o.totals.subtotalCents)}</dd>
               {o.totals.discountCents ? (
                 <>
-                  <dt>Descuento{o.coupon?.code ? ` (${o.coupon.code})` : ''}</dt>
+                  <dt>
+                    {t('Descuento', 'Discount')}
+                    {o.coupon?.code ? ` (${o.coupon.code})` : ''}
+                  </dt>
                   <dd className="mono">−{formatEur(o.totals.discountCents)}</dd>
                 </>
               ) : null}
               {o.totals.deliveryFeeCents ? (
                 <>
-                  <dt>Envío</dt>
+                  <dt>{t('Envío', 'Delivery')}</dt>
                   <dd className="mono">{formatEur(o.totals.deliveryFeeCents)}</dd>
                 </>
               ) : null}
               <dt>
-                <strong>Total (IVA incl.)</strong>
+                <strong>{t('Total (IVA incl.)', 'Total (VAT incl.)')}</strong>
               </dt>
               <dd className="mono">
                 <strong>{formatEur(o.totals.totalCents)}</strong>
               </dd>
-              <dt>de los cuales IVA</dt>
+              <dt>{t('de los cuales IVA', 'of which VAT')}</dt>
               <dd className="mono">{formatEur(o.totals.taxCents)}</dd>
             </dl>
           </Card>
           {o.notes ? (
-            <Card title="Comentarios del cliente">
+            <Card title={t('Comentarios del cliente', 'Customer comments')}>
               <p>{o.notes}</p>
             </Card>
           ) : null}
-          <Card title="Historial">
+          <Card title={t('Historial', 'History')}>
             <ol className="timeline">
               {o.history.map((h, i) => (
                 <li key={i}>
@@ -194,59 +199,59 @@ export default function OrderDetailPage() {
           </Card>
         </div>
         <div className="stack">
-          <Card title="Estado">
+          <Card title={t('Estado', 'Status')}>
             <div className="row">
               <Badge tone={STATUS_TONE[o.status]}>{STATUS_LABEL[o.status]}</Badge>
               <Badge tone={o.fulfilment.type === 'delivery' ? 'violet' : 'blue'}>
-                {o.fulfilment.type === 'delivery' ? 'Reparto a domicilio' : 'Recogida en el local'}
+                {o.fulfilment.type === 'delivery' ? t('Reparto a domicilio', 'Home delivery') : t('Recogida en el local', 'Pickup at the restaurant')}
               </Badge>
             </div>
             <dl className="kv" style={{ marginTop: 12 }}>
               {o.fulfilment.scheduledFor ? (
                 <>
-                  <dt>Programado para</dt>
+                  <dt>{t('Programado para', 'Scheduled for')}</dt>
                   <dd>
                     <strong>{formatDateTime(o.fulfilment.scheduledFor)}</strong>
                   </dd>
                 </>
               ) : (
                 <>
-                  <dt>Hora estimada</dt>
+                  <dt>{t('Hora estimada', 'Estimated time')}</dt>
                   <dd>{formatDateTime(o.fulfilment.estimatedReadyAt)}</dd>
                 </>
               )}
-              <dt>Si se agota</dt>
+              <dt>{t('Si se agota', 'If sold out')}</dt>
               <dd>{IF_SOLD_OUT_LABEL[o.ifSoldOut ?? 'contact']}</dd>
               {o.cancelReason ? (
                 <>
-                  <dt>Motivo cancelación</dt>
+                  <dt>{t('Motivo cancelación', 'Cancellation reason')}</dt>
                   <dd>{o.cancelReason}</dd>
                 </>
               ) : null}
             </dl>
           </Card>
-          <Card title="Cliente">
+          <Card title={t('Cliente', 'Customer')}>
             {o.customer?.anonymised ? (
-              <p className="muted">Datos eliminados a petición del cliente.</p>
+              <p className="muted">{t('Datos eliminados a petición del cliente.', "Data deleted at the customer's request.")}</p>
             ) : (
               <dl className="kv">
-                <dt>Nombre</dt>
+                <dt>{t('Nombre', 'Name')}</dt>
                 <dd>{o.customer?.name ?? '—'}</dd>
-                <dt>Teléfono</dt>
+                <dt>{t('Teléfono', 'Phone')}</dt>
                 <dd>{o.customer?.phone ? <a href={`tel:${o.customer.phone.replace(/\s/g, '')}`}>{o.customer.phone}</a> : '—'}</dd>
-                <dt>Correo</dt>
+                <dt>{t('Correo', 'Email')}</dt>
                 <dd>{o.customer?.email ?? '—'}</dd>
                 {o.customer?.userId && can('customers:read') ? (
                   <>
-                    <dt>Cuenta</dt>
+                    <dt>{t('Cuenta', 'Account')}</dt>
                     <dd>
-                      <Link href={`/customers/${o.customer.userId}`}>Ver ficha del cliente</Link>
+                      <Link href={`/customers/${o.customer.userId}`}>{t('Ver ficha del cliente', 'View customer profile')}</Link>
                     </dd>
                   </>
                 ) : null}
                 {o.fulfilment.type === 'delivery' && o.fulfilment.address ? (
                   <>
-                    <dt>Dirección</dt>
+                    <dt>{t('Dirección', 'Address')}</dt>
                     <dd>
                       {o.fulfilment.address.line1}
                       {o.fulfilment.address.line2 ? `, ${o.fulfilment.address.line2}` : ''}, {o.fulfilment.address.postcode} {o.fulfilment.address.city}
@@ -257,15 +262,15 @@ export default function OrderDetailPage() {
               </dl>
             )}
           </Card>
-          <Card title="Pago">
+          <Card title={t('Pago', 'Payment')}>
             <dl className="kv">
-              <dt>Método</dt>
-              <dd>{o.payment.method === 'cash' ? 'Efectivo (al recoger/entregar)' : 'Tarjeta'}</dd>
-              <dt>Estado</dt>
+              <dt>{t('Método', 'Method')}</dt>
+              <dd>{o.payment.method === 'cash' ? t('Efectivo (al recoger/entregar)', 'Cash (on pickup/delivery)') : t('Tarjeta', 'Card')}</dd>
+              <dt>{t('Estado', 'Status')}</dt>
               <dd>{PAYMENT_LABEL[o.payment.status] ?? o.payment.status}</dd>
               {o.payment.refundedCents ? (
                 <>
-                  <dt>Reembolsado</dt>
+                  <dt>{t('Reembolsado', 'Refunded')}</dt>
                   <dd className="mono">{formatEur(o.payment.refundedCents)}</dd>
                 </>
               ) : null}
@@ -275,7 +280,7 @@ export default function OrderDetailPage() {
                 {o.payment.refunds.map((x, i) => (
                   <li key={i}>
                     <span>
-                      {formatDateTime(x.at)} · {x.reason} <span className="muted">({x.status === 'manual' ? 'manual' : x.status})</span>
+                      {formatDateTime(x.at)} · {x.reason} <span className="muted">({x.status})</span>
                     </span>
                     <span className="mono">{formatEur(x.amountCents)}</span>
                   </li>
@@ -285,39 +290,39 @@ export default function OrderDetailPage() {
           </Card>
           {o.fulfilment.type === 'delivery' ? (
             <Card
-              title="Repartidor"
+              title={t('Repartidor', 'Driver')}
               actions={
                 can('orders:assign_driver') && ['confirmed', 'preparing', 'ready'].includes(o.status) ? (
                   <Button size="sm" onClick={() => setDriverOpen(true)}>
-                    {o.driver?.userId ? 'Cambiar' : 'Asignar'}
+                    {o.driver?.userId ? t('Cambiar', 'Change') : t('Asignar', 'Assign')}
                   </Button>
                 ) : null
               }
             >
               {o.driver?.userId ? (
                 <dl className="kv">
-                  <dt>Nombre</dt>
+                  <dt>{t('Nombre', 'Name')}</dt>
                   <dd>{o.driver.name ?? '—'}</dd>
-                  <dt>Estado</dt>
+                  <dt>{t('Estado', 'Status')}</dt>
                   <dd>
                     {{
-                      assigned: 'Asignado (pendiente de aceptar)',
-                      accepted: 'Aceptado',
-                      declined: 'Rechazado',
-                      picked_up: 'Recogido',
-                      delivered: 'Entregado',
+                      assigned: t('Asignado (pendiente de aceptar)', 'Assigned (awaiting acceptance)'),
+                      accepted: t('Aceptado', 'Accepted'),
+                      declined: t('Rechazado', 'Declined'),
+                      picked_up: t('Recogido', 'Picked up'),
+                      delivered: t('Entregado', 'Delivered'),
                     }[o.driver.state ?? ''] ?? o.driver.state}
                   </dd>
                   {o.driver.lastLocation ? (
                     <>
-                      <dt>Última posición</dt>
+                      <dt>{t('Última posición', 'Last position')}</dt>
                       <dd>
                         <a
                           href={`https://www.google.com/maps?q=${o.driver.lastLocation.lat},${o.driver.lastLocation.lng}`}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Ver en el mapa
+                          {t('Ver en el mapa', 'View on map')}
                         </a>{' '}
                         <span className="muted small">({formatDateTime(o.driver.lastLocation.at)})</span>
                       </dd>
@@ -325,7 +330,7 @@ export default function OrderDetailPage() {
                   ) : null}
                 </dl>
               ) : (
-                <p className="muted">Sin repartidor asignado.</p>
+                <p className="muted">{t('Sin repartidor asignado.', 'No driver assigned.')}</p>
               )}
             </Card>
           ) : null}
@@ -344,32 +349,33 @@ export default function OrderDetailPage() {
 }
 
 function CancelModal({ open, onClose, onConfirm, busy }: { open: boolean; onClose: () => void; onConfirm: (reason: string) => void; busy: boolean }) {
+  const t = useT();
   const [reason, setReason] = useState('');
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title="Cancelar pedido"
+      title={t('Cancelar pedido', 'Cancel order')}
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Volver
+            {t('Volver', 'Back')}
           </Button>
           <Button variant="danger" disabled={reason.trim().length < 3} loading={busy} onClick={() => onConfirm(reason.trim())}>
-            Cancelar pedido
+            {t('Cancelar pedido', 'Cancel order')}
           </Button>
         </>
       }
     >
       <div className="stack">
-        <p className="muted">El cliente verá el pedido como cancelado. Si pagó con tarjeta, haz después el reembolso.</p>
+        <p className="muted">{t('El cliente verá el pedido como cancelado. Si pagó con tarjeta, haz después el reembolso.', 'The customer will see the order as cancelled. If they paid by card, issue the refund afterwards.')}</p>
         <TextArea
-          label="Motivo (obligatorio)"
+          label={t('Motivo (obligatorio)', 'Reason (required)')}
           value={reason}
           maxLength={300}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="Producto agotado, cliente lo pidió por teléfono…"
+          placeholder={t('Producto agotado, cliente lo pidió por teléfono…', 'Item sold out, customer ordered by phone…')}
         />
       </div>
     </Modal>
@@ -377,6 +383,7 @@ function CancelModal({ open, onClose, onConfirm, busy }: { open: boolean; onClos
 }
 
 function RefundModal({ open, onClose, order, max, onDone }: { open: boolean; onClose: () => void; order: AdminOrder; max: number; onDone: () => void }) {
+  const t = useT();
   const { toast } = useFeedback();
   const [amount, setAmount] = useState(centsToInput(max));
   const [reason, setReason] = useState('');
@@ -388,7 +395,7 @@ function RefundModal({ open, onClose, order, max, onDone }: { open: boolean; onC
     setBusy(true);
     try {
       await api(`/api/v1/admin/orders/${order.id}/refund`, { method: 'POST', body: { amountCents: cents, reason: reason.trim() } });
-      toast(`Reembolso de ${formatEur(cents)} registrado`);
+      toast(t(`Reembolso de ${formatEur(cents)} registrado`, `Refund of ${formatEur(cents)} recorded`));
       onClose();
       onDone();
     } catch (e) {
@@ -401,15 +408,15 @@ function RefundModal({ open, onClose, order, max, onDone }: { open: boolean; onC
     <Modal
       open={open}
       onClose={onClose}
-      title={`Reembolsar ${order.number}`}
+      title={`${t('Reembolsar', 'Refund')} ${order.number}`}
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="danger" loading={busy} disabled={invalid || reason.trim().length < 3} onClick={() => void submit()}>
-            Reembolsar
+            {t('Reembolsar', 'Refund')}
           </Button>
         </>
       }
@@ -417,23 +424,24 @@ function RefundModal({ open, onClose, order, max, onDone }: { open: boolean; onC
       <div className="stack">
         <Alert tone="info">
           {order.payment.method === 'card'
-            ? 'Se devolverá a la tarjeta del cliente a través de la pasarela de pago.'
-            : 'Pago en efectivo: se registra el reembolso manual. Devuelve el dinero en el local.'}
+            ? t('Se devolverá a la tarjeta del cliente a través de la pasarela de pago.', "It will be returned to the customer's card through the payment gateway.")
+            : t('Pago en efectivo: se registra el reembolso manual. Devuelve el dinero en el local.', 'Cash payment: the refund is recorded manually. Return the money at the restaurant.')}
         </Alert>
         <TextField
-          label={`Importe (máx. ${formatEur(max)})`}
+          label={t(`Importe (máx. ${formatEur(max)})`, `Amount (max. ${formatEur(max)})`)}
           inputMode="decimal"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          error={amount && invalid ? 'Importe no válido' : null}
+          error={amount && invalid ? t('Importe no válido', 'Invalid amount') : null}
         />
-        <TextArea label="Motivo" value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} />
+        <TextArea label={t('Motivo', 'Reason')} value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} />
       </div>
     </Modal>
   );
 }
 
 function DriverModal({ open, onClose, order, onDone }: { open: boolean; onClose: () => void; order: AdminOrder; onDone: () => void }) {
+  const t = useT();
   const { toast } = useFeedback();
   const drivers = useResource<{ items: { id: string; name: string | null; phone: string | null }[] }>(
     open ? `/api/v1/admin/staff/drivers${qs({ branchId: order.branchId })}` : null,
@@ -445,7 +453,7 @@ function DriverModal({ open, onClose, order, onDone }: { open: boolean; onClose:
     setBusy(true);
     try {
       await api(`/api/v1/admin/orders/${order.id}/assign-driver`, { method: 'POST', body: { driverId } });
-      toast('Repartidor asignado: le llega el aviso en su app');
+      toast(t('Repartidor asignado: le llega el aviso en su app', 'Driver assigned: they are notified in their app'));
       onClose();
       onDone();
     } catch (e) {
@@ -459,15 +467,15 @@ function DriverModal({ open, onClose, order, onDone }: { open: boolean; onClose:
     <Modal
       open={open}
       onClose={onClose}
-      title="Asignar repartidor"
+      title={t('Asignar repartidor', 'Assign driver')}
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="primary" loading={busy} disabled={!driverId} onClick={() => void submit()}>
-            Asignar
+            {t('Asignar', 'Assign')}
           </Button>
         </>
       }
@@ -475,10 +483,10 @@ function DriverModal({ open, onClose, order, onDone }: { open: boolean; onClose:
       {drivers.loading ? (
         <Spinner />
       ) : list.length === 0 ? (
-        <Alert tone="warning">No hay repartidores activos en este restaurante. Créalos en «Equipo y permisos».</Alert>
+        <Alert tone="warning">{t('No hay repartidores activos en este restaurante. Créalos en «Equipo y permisos».', 'There are no active drivers at this restaurant. Create them under “Team & permissions”.')}</Alert>
       ) : (
-        <SelectField label="Repartidor" value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-          <option value="">Elige…</option>
+        <SelectField label={t('Repartidor', 'Driver')} value={driverId} onChange={(e) => setDriverId(e.target.value)}>
+          <option value="">{t('Elige…', 'Choose…')}</option>
           {list.map((d) => (
             <option key={d.id} value={d.id}>
               {d.name ?? d.id}

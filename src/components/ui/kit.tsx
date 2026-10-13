@@ -10,6 +10,7 @@ import {
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
+import { useT } from '@/lib/i18n';
 import { Icon, type IconName } from './Icon';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
@@ -226,11 +227,12 @@ export function Toggle({
   );
 }
 
-export function Spinner({ label = 'Cargando…' }: { label?: string }) {
+export function Spinner({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div className="loading" role="status">
       <span className="spinner" aria-hidden="true" />
-      <span>{label}</span>
+      <span>{label ?? t('Cargando…', 'Loading…')}</span>
     </div>
   );
 }
@@ -281,18 +283,19 @@ export function Tabs<T extends string>({
 }
 
 export function Pagination({ page, pageSize, total, onPage }: { page: number; pageSize: number; total: number; onPage: (p: number) => void }) {
+  const t = useT();
   const pages = Math.max(1, Math.ceil(total / pageSize));
   if (pages <= 1) return null;
   return (
-    <nav className="pagination" aria-label="Paginación">
+    <nav className="pagination" aria-label={t('Paginación', 'Pagination')}>
       <Button size="sm" variant="ghost" icon="left" disabled={page <= 1} onClick={() => onPage(page - 1)}>
-        Anterior
+        {t('Anterior', 'Previous')}
       </Button>
       <span className="muted">
-        Página {page} de {pages} · {total} resultados
+        {t(`Página ${page} de ${pages} · ${total} resultados`, `Page ${page} of ${pages} · ${total} results`)}
       </span>
       <Button size="sm" variant="ghost" disabled={page >= pages} onClick={() => onPage(page + 1)}>
-        Siguiente
+        {t('Siguiente', 'Next')}
         <Icon name="right" size={15} />
       </Button>
     </nav>
@@ -315,6 +318,7 @@ export function Modal({
   footer?: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }) {
+  const t = useT();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
@@ -337,7 +341,7 @@ export function Modal({
         <div className="modal-inner">
           <header className="modal-head">
             <h2 id="modal-title">{title}</h2>
-            <button type="button" className="icon-btn" onClick={onClose} aria-label="Cerrar">
+            <button type="button" className="icon-btn" onClick={onClose} aria-label={t('Cerrar', 'Close')}>
               <Icon name="close" />
             </button>
           </header>
@@ -352,19 +356,20 @@ export function Modal({
 export function SearchInput({
   value,
   onChange,
-  placeholder = 'Buscar…',
-  label = 'Buscar',
+  placeholder,
+  label,
 }: {
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   label?: string;
 }) {
+  const t = useT();
   return (
     <label className="search">
       <Icon name="search" size={16} />
-      <span className="sr-only">{label}</span>
-      <input type="search" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <span className="sr-only">{label ?? t('Buscar', 'Search')}</span>
+      <input type="search" value={value} placeholder={placeholder ?? t('Buscar…', 'Search…')} onChange={(e) => onChange(e.target.value)} />
     </label>
   );
 }
