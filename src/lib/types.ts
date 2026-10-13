@@ -202,19 +202,19 @@ export interface ModifierGroupDoc {
   group: OptionGroup;
   seed?: { sourceId?: string; adminEdited?: boolean };
 }
-export const ALLERGENS: { key: string; label: string }[] = [
-  { key: 'gluten', label: 'Gluten' },
-  { key: 'crustaceans', label: 'Crustáceos' },
-  { key: 'eggs', label: 'Huevos' },
-  { key: 'fish', label: 'Pescado' },
-  { key: 'peanuts', label: 'Cacahuetes' },
-  { key: 'soybeans', label: 'Soja' },
-  { key: 'milk', label: 'Lácteos' },
-  { key: 'nuts', label: 'Frutos de cáscara' },
-  { key: 'celery', label: 'Apio' },
-  { key: 'mustard', label: 'Mostaza' },
-  { key: 'sesame', label: 'Sésamo' },
-  { key: 'sulphites', label: 'Sulfitos' },
-  { key: 'lupin', label: 'Altramuces' },
-  { key: 'molluscs', label: 'Moluscos' },
+export const ALLERGENS: { key: string; label: string; en: string }[] = [
+  { key: 'gluten', label: 'Gluten', en: 'Gluten' },
+  { key: 'crustaceans', label: 'Crustáceos', en: 'Crustaceans' },
+  { key: 'eggs', label: 'Huevos', en: 'Eggs' },
+  { key: 'fish', label: 'Pescado', en: 'Fish' },
+  { key: 'peanuts', label: 'Cacahuetes', en: 'Peanuts' },
+  { key: 'soybeans', label: 'Soja', en: 'Soybeans' },
+  { key: 'milk', label: 'Lácteos', en: 'Milk' },
+  { key: 'nuts', label: 'Frutos de cáscara', en: 'Tree nuts' },
+  { key: 'celery', label: 'Apio', en: 'Celery' },
+  { key: 'mustard', label: 'Mostaza', en: 'Mustard' },
+  { key: 'sesame', label: 'Sésamo', en: 'Sesame' },
+  { key: 'sulphites', label: 'Sulfitos', en: 'Sulphites' },
+  { key: 'lupin', label: 'Altramuces', en: 'Lupin' },
+  { key: 'molluscs', label: 'Moluscos', en: 'Molluscs' },
 ];

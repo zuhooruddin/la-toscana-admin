@@ -12,6 +12,7 @@ import { useBranches } from '@/lib/branch';
 import { errorText, formatDate, formatDateTime, formatEur, STATUS_LABEL, STATUS_TONE } from '@/lib/format';
 import { useResource } from '@/lib/use-resource';
 import type { CustomerSummary } from '../page';
+import { useT } from '@/lib/i18n';
 
 interface Detail {
   customer: CustomerSummary & { lang: string; addresses: { label: string | null; line1: string; line2: string | null; postcode: string; city: string }[] };
@@ -21,6 +22,7 @@ interface Detail {
 
 export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const t = useT();
   const router = useRouter();
   const { can } = useAuth();
   const { byId } = useBranches();
@@ -37,17 +39,22 @@ export default function CustomerDetailPage() {
     const block = c.status === 'active';
     if (
       !(await confirm({
-        title: block ? 'Bloquear cliente' : 'Desbloquear cliente',
-        message: block ? 'No podrá iniciar sesión ni pedir con su cuenta. Se cerrarán sus sesiones abiertas.' : 'Podrá volver a usar su cuenta.',
+        title: block ? t('Bloquear cliente', 'Block customer') : t('Desbloquear cliente', 'Unblock customer'),
+        message: block
+          ? t(
+              'No podrá iniciar sesión ni pedir con su cuenta. Se cerrarán sus sesiones abiertas.',
+              'They will not be able to log in or order with their account. Their open sessions will be closed.',
+            )
+          : t('Podrá volver a usar su cuenta.', 'They will be able to use their account again.'),
         danger: block,
-        confirmLabel: block ? 'Bloquear' : 'Desbloquear',
+        confirmLabel: block ? t('Bloquear', 'Block') : t('Desbloquear', 'Unblock'),
       }))
     )
       return;
     setBusy(true);
     try {
       await api(`/api/v1/admin/customers/${id}`, { method: 'PATCH', body: { status: block ? 'disabled' : 'active' } });
-      toast(block ? 'Cliente bloqueado' : 'Cliente desbloqueado');
+      toast(block ? t('Cliente bloqueado', 'Customer blocked') : t('Cliente desbloqueado', 'Customer unblocked'));
       r.reload();
     } catch (e) {
       toast(errorText(e), 'error');
@@ -59,10 +66,13 @@ export default function CustomerDetailPage() {
   async function erase() {
     if (
       !(await confirm({
-        title: 'Eliminar datos del cliente (RGPD)',
-        message: 'Se borran nombre, correo, teléfono y direcciones. Los pedidos se conservan anonimizados por obligación contable. No se puede deshacer.',
+        title: t('Eliminar datos del cliente (RGPD)', 'Delete customer data (GDPR)'),
+        message: t(
+          'Se borran nombre, correo, teléfono y direcciones. Los pedidos se conservan anonimizados por obligación contable. No se puede deshacer.',
+          'Name, email, phone and addresses are deleted. Orders are kept anonymised for accounting purposes. This cannot be undone.',
+        ),
         danger: true,
-        confirmLabel: 'Eliminar datos',
+        confirmLabel: t('Eliminar datos', 'Delete data'),
         typeToConfirm: 'ELIMINAR',
       }))
     )
@@ -70,7 +80,7 @@ export default function CustomerDetailPage() {
     setBusy(true);
     try {
       await api(`/api/v1/admin/customers/${id}/erase`, { method: 'POST', body: { confirm: 'ELIMINAR', reference: reference.trim() || undefined } });
-      toast('Datos del cliente eliminados');
+      toast(t('Datos del cliente eliminados', 'Customer data deleted'));
       router.replace('/customers');
     } catch (e) {
       toast(errorText(e), 'error');
@@ -83,46 +93,46 @@ export default function CustomerDetailPage() {
       <PageHeader
         back={
           <Link href="/customers" className="back-link">
-            <Icon name="left" size={15} /> Clientes
+            <Icon name="left" size={15} /> {t('Clientes', 'Customers')}
           </Link>
         }
         title={c.name ?? c.email}
         subtitle={
           <>
-            Cliente desde {formatDate(c.createdAt)} · último acceso {formatDateTime(c.lastLoginAt)}
+            {t('Cliente desde', 'Customer since')} {formatDate(c.createdAt)} · {t('último acceso', 'last login')} {formatDateTime(c.lastLoginAt)}
           </>
         }
         actions={
           can('customers:write') ? (
             <Button loading={busy} variant={c.status === 'active' ? 'secondary' : 'success'} onClick={() => void toggleBlock()}>
-              {c.status === 'active' ? 'Bloquear' : 'Desbloquear'}
+              {c.status === 'active' ? t('Bloquear', 'Block') : t('Desbloquear', 'Unblock')}
             </Button>
           ) : null
         }
       />
       <div className="grid-2" style={{ gridTemplateColumns: 'minmax(0,1fr) minmax(0,1.5fr)', alignItems: 'start' }}>
         <div className="stack">
-          <Card title="Datos">
+          <Card title={t('Datos', 'Details')}>
             <dl className="kv">
-              <dt>Correo</dt>
+              <dt>{t('Correo', 'Email')}</dt>
               <dd>{c.email}</dd>
-              <dt>Teléfono</dt>
+              <dt>{t('Teléfono', 'Phone')}</dt>
               <dd>{c.phone ? <a href={`tel:${c.phone.replace(/\s/g, '')}`}>{c.phone}</a> : '—'}</dd>
-              <dt>Idioma</dt>
-              <dd>{c.lang === 'en' ? 'Inglés' : 'Español'}</dd>
-              <dt>Promociones</dt>
-              <dd>{c.marketingConsent ? 'Acepta comunicaciones' : 'No acepta'}</dd>
-              <dt>Estado</dt>
-              <dd>{c.status === 'active' ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Bloqueado</Badge>}</dd>
-              <dt>Pedidos</dt>
+              <dt>{t('Idioma', 'Language')}</dt>
+              <dd>{c.lang === 'en' ? t('Inglés', 'English') : t('Español', 'Spanish')}</dd>
+              <dt>{t('Promociones', 'Promotions')}</dt>
+              <dd>{c.marketingConsent ? t('Acepta comunicaciones', 'Accepts communications') : t('No acepta', 'Does not accept')}</dd>
+              <dt>{t('Estado', 'Status')}</dt>
+              <dd>{c.status === 'active' ? <Badge tone="green">{t('Activo', 'Active')}</Badge> : <Badge tone="red">{t('Bloqueado', 'Blocked')}</Badge>}</dd>
+              <dt>{t('Pedidos', 'Orders')}</dt>
               <dd>
                 {c.orders.count} · {formatEur(c.orders.totalCents)}
               </dd>
             </dl>
           </Card>
-          <Card title="Direcciones guardadas">
+          <Card title={t('Direcciones guardadas', 'Saved addresses')}>
             {c.addresses.length === 0 ? (
-              <p className="muted">Ninguna.</p>
+              <p className="muted">{t('Ninguna.', 'None.')}</p>
             ) : (
               <ul className="line-list">
                 {c.addresses.map((a, i) => (
@@ -138,36 +148,41 @@ export default function CustomerDetailPage() {
             )}
           </Card>
           {can('privacy:manage') ? (
-            <Card title="Protección de datos">
+            <Card title={t('Protección de datos', 'Data protection')}>
               <div className="stack">
-                <p className="muted small">Para atender una solicitud de supresión (RGPD). Queda registrado en el registro de actividad.</p>
+                <p className="muted small">
+                  {t(
+                    'Para atender una solicitud de supresión (RGPD). Queda registrado en el registro de actividad.',
+                    'To handle an erasure request (GDPR). It is recorded in the activity log.',
+                  )}
+                </p>
                 <TextField
-                  label="Referencia de la solicitud (opcional)"
+                  label={t('Referencia de la solicitud (opcional)', 'Request reference (optional)')}
                   value={reference}
                   maxLength={200}
                   onChange={(e) => setReference(e.target.value)}
-                  placeholder="Correo del 13/10/2026"
+                  placeholder={t('Correo del 13/10/2026', 'Email of 13/10/2026')}
                 />
                 <Button variant="danger" icon="trash" loading={busy} onClick={() => void erase()}>
-                  Eliminar datos del cliente
+                  {t('Eliminar datos del cliente', 'Delete customer data')}
                 </Button>
               </div>
             </Card>
           ) : null}
         </div>
         <div className="stack">
-          <Card title="Pedidos recientes" padded={false}>
+          <Card title={t('Pedidos recientes', 'Recent orders')} padded={false}>
             {orders.length === 0 ? (
-              <Empty icon="orders" title="Sin pedidos" />
+              <Empty icon="orders" title={t('Sin pedidos', 'No orders')} />
             ) : (
               <div className="table-wrap">
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Pedido</th>
-                      <th>Fecha</th>
-                      <th>Restaurante</th>
-                      <th>Estado</th>
+                      <th>{t('Pedido', 'Order')}</th>
+                      <th>{t('Fecha', 'Date')}</th>
+                      <th>{t('Restaurante', 'Restaurant')}</th>
+                      <th>{t('Estado', 'Status')}</th>
                       <th className="num">Total</th>
                     </tr>
                   </thead>
@@ -192,18 +207,18 @@ export default function CustomerDetailPage() {
               </div>
             )}
           </Card>
-          <Card title="Reservas" padded={false}>
+          <Card title={t('Reservas', 'Reservations')} padded={false}>
             {reservations.length === 0 ? (
-              <Empty icon="calendar" title="Sin reservas" />
+              <Empty icon="calendar" title={t('Sin reservas', 'No reservations')} />
             ) : (
               <div className="table-wrap">
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Fecha</th>
-                      <th>Restaurante</th>
-                      <th className="num">Personas</th>
-                      <th>Estado</th>
+                      <th>{t('Fecha', 'Date')}</th>
+                      <th>{t('Restaurante', 'Restaurant')}</th>
+                      <th className="num">{t('Personas', 'Guests')}</th>
+                      <th>{t('Estado', 'Status')}</th>
                     </tr>
                   </thead>
                   <tbody>

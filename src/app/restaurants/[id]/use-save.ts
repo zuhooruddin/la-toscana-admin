@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useFeedback } from '@/components/ui/feedback';
 import { api } from '@/lib/api';
 import { errorText } from '@/lib/format';
+import { tr } from '@/lib/i18n';
 
 /** PATCH a branch with only the fields of one tab; readiness errors are shown with the missing items. */
 export function useBranchSave(branchId: string, onSaved: () => void) {
   const { toast } = useFeedback();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  async function save(body: Record<string, unknown>, message = 'Cambios guardados') {
+  async function save(body: Record<string, unknown>, message = tr('Cambios guardados', 'Changes saved')) {
     setBusy(true);
     setError(null);
     try {

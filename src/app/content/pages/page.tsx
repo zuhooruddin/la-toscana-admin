@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/auth';
 import { errorText, formatDateTime } from '@/lib/format';
 import type { Loc } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 interface PageRow {
   _id: string;
@@ -24,6 +25,7 @@ interface PageRow {
 }
 
 export default function PagesListPage() {
+  const t = useT();
   const { can } = useAuth();
   const router = useRouter();
   const { toast } = useFeedback();
@@ -40,7 +42,7 @@ export default function PagesListPage() {
         method: 'POST',
         body: { slug: slugify(title), kind, draft: { title: { es: title.trim() }, blocks: [], seo: {} } },
       });
-      toast('Página creada como borrador');
+      toast(t('Página creada como borrador', 'Page created as a draft'));
       router.push(`/content/pages/${res.page._id}`);
     } catch (e) {
       toast(errorText(e), 'error');
@@ -51,12 +53,15 @@ export default function PagesListPage() {
   return (
     <>
       <PageHeader
-        title="Páginas"
-        subtitle="Textos legales y páginas informativas de la web. Se editan en borrador y se publican cuando estén listas."
+        title={t('Páginas', 'Pages')}
+        subtitle={t(
+          'Textos legales y páginas informativas de la web. Se editan en borrador y se publican cuando estén listas.',
+          'Legal texts and informational pages of the website. They are edited as drafts and published when ready.',
+        )}
         actions={
           can('content:write') ? (
             <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>
-              Nueva página
+              {t('Nueva página', 'New page')}
             </Button>
           ) : null
         }
@@ -66,17 +71,17 @@ export default function PagesListPage() {
         {r.loading ? (
           <Spinner />
         ) : (r.data?.items ?? []).length === 0 ? (
-          <Empty icon="file" title="Sin páginas" />
+          <Empty icon="file" title={t('Sin páginas', 'No pages')} />
         ) : (
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Página</th>
-                  <th>Dirección</th>
-                  <th>Tipo</th>
-                  <th>Estado</th>
-                  <th>Actualizada</th>
+                  <th>{t('Página', 'Page')}</th>
+                  <th>{t('Dirección', 'Address')}</th>
+                  <th>{t('Tipo', 'Type')}</th>
+                  <th>{t('Estado', 'Status')}</th>
+                  <th>{t('Actualizada', 'Updated')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,13 +93,17 @@ export default function PagesListPage() {
                       </Link>
                     </td>
                     <td className="mono small">/{p.slug === 'home' ? '' : p.slug}</td>
-                    <td>{p.kind === 'legal' ? 'Legal' : 'Página'}</td>
+                    <td>{p.kind === 'legal' ? t('Legal', 'Legal') : t('Página', 'Page')}</td>
                     <td>
-                      {p.status === 'published' ? <Badge tone="green">Publicada</Badge> : <Badge tone="grey">Borrador</Badge>}
+                      {p.status === 'published' ? (
+                        <Badge tone="green">{t('Publicada', 'Published')}</Badge>
+                      ) : (
+                        <Badge tone="grey">{t('Borrador', 'Draft')}</Badge>
+                      )}
                       {p.legalReviewPending ? (
                         <>
                           {' '}
-                          <Badge tone="amber">Revisión legal pendiente</Badge>
+                          <Badge tone="amber">{t('Revisión legal pendiente', 'Legal review pending')}</Badge>
                         </>
                       ) : null}
                     </td>
@@ -109,24 +118,29 @@ export default function PagesListPage() {
       <Modal
         open={creating}
         onClose={() => setCreating(false)}
-        title="Nueva página"
+        title={t('Nueva página', 'New page')}
         size="sm"
         footer={
           <>
             <Button variant="ghost" onClick={() => setCreating(false)}>
-              Cancelar
+              {t('Cancelar', 'Cancel')}
             </Button>
             <Button variant="primary" loading={busy} disabled={title.trim().length < 2} onClick={() => void create()}>
-              Crear
+              {t('Crear', 'Create')}
             </Button>
           </>
         }
       >
         <div className="stack">
-          <TextField label="Título" value={title} onChange={(e) => setTitle(e.target.value)} hint={title ? `Dirección: /${slugify(title)}` : undefined} />
-          <SelectField label="Tipo" value={kind} onChange={(e) => setKind(e.target.value as 'page' | 'legal')}>
-            <option value="page">Página informativa</option>
-            <option value="legal">Texto legal</option>
+          <TextField
+            label={t('Título', 'Title')}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            hint={title ? `${t('Dirección', 'Address')}: /${slugify(title)}` : undefined}
+          />
+          <SelectField label={t('Tipo', 'Type')} value={kind} onChange={(e) => setKind(e.target.value as 'page' | 'legal')}>
+            <option value="page">{t('Página informativa', 'Informational page')}</option>
+            <option value="legal">{t('Texto legal', 'Legal text')}</option>
           </SelectField>
         </div>
       </Modal>

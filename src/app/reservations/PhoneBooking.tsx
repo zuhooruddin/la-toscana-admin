@@ -29,7 +29,8 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
   );
 
   async function submit() {
-    if (!time || name.trim().length < 2 || !/^\+?[0-9 ]{9,16}$/.test(phone.trim())) return setError(t('Completa hora, nombre y un teléfono válido.', 'Fill in time, name and a valid phone number.'));
+    if (!time || name.trim().length < 2 || !/^\+?[0-9 ]{9,16}$/.test(phone.trim()))
+      return setError(t('Completa hora, nombre y un teléfono válido.', 'Fill in time, name and a valid phone number.'));
     setBusy(true);
     setError(null);
     try {
@@ -74,7 +75,9 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
     >
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        {bookable.length === 0 ? <Alert tone="warning">{t('Ningún restaurante tiene las reservas online activadas.', 'No restaurant has online reservations enabled.')}</Alert> : null}
+        {bookable.length === 0 ? (
+          <Alert tone="warning">{t('Ningún restaurante tiene las reservas online activadas.', 'No restaurant has online reservations enabled.')}</Alert>
+        ) : null}
         <div className="grid-3">
           <SelectField label={t('Restaurante', 'Restaurant')} value={branchId} onChange={(e) => (setBranchId(e.target.value), setTime(''))}>
             {bookable.map((b) => (
@@ -115,7 +118,13 @@ export function PhoneBooking({ defaultDate, onClose, onDone }: { defaultDate: st
           <TextField label={t('Nombre', 'Name')} value={name} onChange={(e) => setName(e.target.value)} required />
           <TextField label={t('Teléfono', 'Phone')} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </div>
-        <TextArea label={t('Notas', 'Notes')} value={notes} maxLength={500} onChange={(e) => setNotes(e.target.value)} placeholder={t('Trona, alergias, terraza…', 'High chair, allergies, terrace…')} />
+        <TextArea
+          label={t('Notas', 'Notes')}
+          value={notes}
+          maxLength={500}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder={t('Trona, alergias, terraza…', 'High chair, allergies, terrace…')}
+        />
       </div>
     </Modal>
   );

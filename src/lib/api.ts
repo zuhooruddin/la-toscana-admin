@@ -102,7 +102,11 @@ export async function api<T>(path: string, opts: ApiOptions = {}, retried = fals
     });
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw e;
-    throw new ApiError(0, 'NETWORK', tr('No se ha podido conectar con el servidor. Comprueba tu conexión.', 'Could not connect to the server. Check your connection.'));
+    throw new ApiError(
+      0,
+      'NETWORK',
+      tr('No se ha podido conectar con el servidor. Comprueba tu conexión.', 'Could not connect to the server. Check your connection.'),
+    );
   }
 
   if (r.status === 401 && !retried && !path.startsWith('/api/v1/auth/login')) {

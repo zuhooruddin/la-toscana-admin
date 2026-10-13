@@ -41,10 +41,19 @@ export default function Dashboard() {
 
   return (
     <>
-      <PageHeader title={`${greeting}${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`} subtitle={t('Resumen de hoy en tus restaurantes', 'Today at your restaurants')} />
+      <PageHeader
+        title={`${greeting}${me?.name ? `, ${me.name.split(' ')[0]}` : ''}`}
+        subtitle={t('Resumen de hoy en tus restaurantes', 'Today at your restaurants')}
+      />
       {summary.error ? <Alert tone="danger">{errorText(summary.error)}</Alert> : null}
       <div className="grid-4" style={{ marginBottom: 16 }}>
-        <Stat icon="orders" tone="blue" label={t('Pedidos hoy', 'Orders today')} value={s ? s.orders : '—'} hint={s ? t(`${s.byStatus.cancelled ?? 0} cancelados`, `${s.byStatus.cancelled ?? 0} cancelled`) : undefined} />
+        <Stat
+          icon="orders"
+          tone="blue"
+          label={t('Pedidos hoy', 'Orders today')}
+          value={s ? s.orders : '—'}
+          hint={s ? t(`${s.byStatus.cancelled ?? 0} cancelados`, `${s.byStatus.cancelled ?? 0} cancelled`) : undefined}
+        />
         <Stat
           icon="euro"
           tone="green"
@@ -58,13 +67,18 @@ export default function Dashboard() {
           tone="red"
           label={t('Pedidos en curso', 'Active orders')}
           value={active.data ? orders.length : '—'}
-          hint={orders.filter((o) => o.status === 'confirmed').length ? t(`${orders.filter((o) => o.status === 'confirmed').length} por aceptar`, `${orders.filter((o) => o.status === 'confirmed').length} to accept`) : undefined}
+          hint={
+            orders.filter((o) => o.status === 'confirmed').length
+              ? t(`${orders.filter((o) => o.status === 'confirmed').length} por aceptar`, `${orders.filter((o) => o.status === 'confirmed').length} to accept`)
+              : undefined
+          }
         />
       </div>
       {s && s.simulatedCents > 0 ? (
         <div style={{ marginBottom: 16 }}>
           <Alert tone="warning">
-            {formatEur(s.simulatedCents)} {t('de las ventas de hoy son pagos con tarjeta', "of today's sales are card payments that are")} <strong>{t('simulados', 'simulated')}</strong> {t('(modo de pruebas). No es dinero real.', '(test mode). This is not real money.')}
+            {formatEur(s.simulatedCents)} {t('de las ventas de hoy son pagos con tarjeta', "of today's sales are card payments that are")}{' '}
+            <strong>{t('simulados', 'simulated')}</strong> {t('(modo de pruebas). No es dinero real.', '(test mode). This is not real money.')}
           </Alert>
         </div>
       ) : null}
@@ -109,7 +123,9 @@ export default function Dashboard() {
                         </Link>
                         <div className="muted small">
                           {byId(o.branchId)?.name ?? o.branchName} ·{' '}
-                          {o.fulfilment.scheduledFor ? t(`Programado ${formatTime(o.fulfilment.scheduledFor)}`, `Scheduled ${formatTime(o.fulfilment.scheduledFor)}`) : minutesAgo(o.createdAt)}
+                          {o.fulfilment.scheduledFor
+                            ? t(`Programado ${formatTime(o.fulfilment.scheduledFor)}`, `Scheduled ${formatTime(o.fulfilment.scheduledFor)}`)
+                            : minutesAgo(o.createdAt)}
                         </div>
                       </td>
                       <td>{o.customer?.name ?? '—'}</td>

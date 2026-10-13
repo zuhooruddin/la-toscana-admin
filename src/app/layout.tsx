@@ -6,7 +6,8 @@ import './globals.css';
 import { AuthGate } from '@/components/shell/AuthGate';
 import { FeedbackProvider } from '@/components/ui/feedback';
 import { AuthProvider } from '@/lib/auth';
-import { I18nProvider, LANG_COOKIE, type Lang } from '@/lib/i18n';
+import { I18nProvider } from '@/lib/i18n';
+import { LANG_COOKIE, type Lang } from '@/lib/i18n-config';
 
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope', display: 'swap' });
 

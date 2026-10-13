@@ -43,7 +43,13 @@ export default function AuditPage() {
   const items = (r.data ?? r.stale)?.items ?? [];
   return (
     <>
-      <PageHeader title={t('Registro de actividad', 'Activity log')} subtitle={t('Cambios hechos en el panel, la web y las apps. No se puede modificar.', 'Changes made in the panel, website and apps. It cannot be edited.')} />
+      <PageHeader
+        title={t('Registro de actividad', 'Activity log')}
+        subtitle={t(
+          'Cambios hechos en el panel, la web y las apps. No se puede modificar.',
+          'Changes made in the panel, website and apps. It cannot be edited.',
+        )}
+      />
       <div className="filters">
         <select className="input" aria-label={t('Tipo', 'Type')} value={entity} onChange={(e) => (setEntity(e.target.value), setPage(1))}>
           <option value="">{t('Todo', 'All')}</option>
@@ -94,7 +100,9 @@ export default function AuditPage() {
               <Button size="sm" variant="ghost" disabled={page <= 1} onClick={() => setPage(page - 1)}>
                 {t('Anterior', 'Previous')}
               </Button>
-              <span className="muted">{t('Página', 'Page')} {page}</span>
+              <span className="muted">
+                {t('Página', 'Page')} {page}
+              </span>
               <Button size="sm" variant="ghost" disabled={items.length < 50} onClick={() => setPage(page + 1)}>
                 {t('Siguiente', 'Next')}
               </Button>

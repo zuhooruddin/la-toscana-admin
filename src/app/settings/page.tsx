@@ -22,7 +22,13 @@ export default function SettingsPage() {
   const ro = !can('settings:write');
   return (
     <>
-      <PageHeader title={t('Ajustes', 'Settings')} subtitle={t('Datos del negocio, redes, apps, SEO e integraciones. Se aplican a la web y a las apps.', 'Business details, social networks, apps, SEO and integrations. They apply to the website and the apps.')} />
+      <PageHeader
+        title={t('Ajustes', 'Settings')}
+        subtitle={t(
+          'Datos del negocio, redes, apps, SEO e integraciones. Se aplican a la web y a las apps.',
+          'Business details, social networks, apps, SEO and integrations. They apply to the website and the apps.',
+        )}
+      />
       {ro ? (
         <div style={{ marginBottom: 16 }}>
           <Alert tone="info">{t('Solo lectura: solo el propietario puede cambiar los ajustes.', 'Read-only: only the owner can change the settings.')}</Alert>

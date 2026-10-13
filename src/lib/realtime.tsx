@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { io, type Socket } from 'socket.io-client';
 import { useAuth } from './auth';
 import { useBranches } from './branch';
@@ -93,19 +93,17 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     };
   }, [me, canRead, branchKey]);
 
+  // Stable identities: pages put these in effect dependencies, so changing them would re-run those effects.
+  const markSeen = useCallback((id: string) => setUnseen((u) => (u.includes(id) ? u.filter((x) => x !== id) : u)), []);
+  const subscribe = useCallback((h: Handler) => {
+    handlers.current.add(h);
+    return () => {
+      handlers.current.delete(h);
+    };
+  }, []);
   const value = useMemo<RealtimeValue>(
-    () => ({
-      connected,
-      unseen,
-      markSeen: (id) => setUnseen((u) => u.filter((x) => x !== id)),
-      subscribe: (h) => {
-        handlers.current.add(h);
-        return () => handlers.current.delete(h);
-      },
-      sound,
-      setSound: setSoundState,
-    }),
-    [connected, unseen, sound],
+    () => ({ connected, unseen, markSeen, subscribe, sound, setSound: setSoundState }),
+    [connected, unseen, sound, markSeen, subscribe],
   );
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 }

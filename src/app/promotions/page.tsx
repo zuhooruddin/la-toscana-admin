@@ -34,7 +34,10 @@ export default function PromotionsPage() {
     <>
       <PageHeader
         title={t('Promociones', 'Promotions')}
-        subtitle={t('Códigos de descuento para la web y la app. Las ofertas públicas aparecen en la página «Ofertas».', 'Discount codes for the website and app. Public offers appear on the “Offers” page.')}
+        subtitle={t(
+          'Códigos de descuento para la web y la app. Las ofertas públicas aparecen en la página «Ofertas».',
+          'Discount codes for the website and app. Public offers appear on the “Offers” page.',
+        )}
         actions={
           can('promotions:write') ? (
             <Button variant="primary" icon="plus" onClick={() => setEdit('new')}>
@@ -74,13 +77,23 @@ export default function PromotionsPage() {
                       </td>
                       <td>
                         {c.type === 'percent' ? `${(c.percentBps ?? 0) / 100} %` : formatEur(c.amountCents)}
-                        {c.maxDiscountCents ? <div className="muted small">{t('máx.', 'max.')} {formatEur(c.maxDiscountCents)}</div> : null}
+                        {c.maxDiscountCents ? (
+                          <div className="muted small">
+                            {t('máx.', 'max.')} {formatEur(c.maxDiscountCents)}
+                          </div>
+                        ) : null}
                       </td>
                       <td className="small">
-                        {c.minSubtotalCents ? t(`Mínimo ${formatEur(c.minSubtotalCents)}`, `Minimum ${formatEur(c.minSubtotalCents)}`) : t('Sin mínimo', 'No minimum')}
-                        {c.fulfilment !== 'any' ? ` · ${c.fulfilment === 'pickup' ? t('solo recogida', 'pickup only') : t('solo reparto', 'delivery only')}` : ''}
+                        {c.minSubtotalCents
+                          ? t(`Mínimo ${formatEur(c.minSubtotalCents)}`, `Minimum ${formatEur(c.minSubtotalCents)}`)
+                          : t('Sin mínimo', 'No minimum')}
+                        {c.fulfilment !== 'any'
+                          ? ` · ${c.fulfilment === 'pickup' ? t('solo recogida', 'pickup only') : t('solo reparto', 'delivery only')}`
+                          : ''}
                         <div className="muted">
-                          {c.branchIds.length ? c.branchIds.map((id) => byId(id)?.name.replace('La Toscana ', '') ?? '—').join(', ') : t('Todos los restaurantes', 'All restaurants')}
+                          {c.branchIds.length
+                            ? c.branchIds.map((id) => byId(id)?.name.replace('La Toscana ', '') ?? '—').join(', ')
+                            : t('Todos los restaurantes', 'All restaurants')}
                         </div>
                       </td>
                       <td className="small">
@@ -91,7 +104,13 @@ export default function PromotionsPage() {
                         {c.maxRedemptions ? ` / ${c.maxRedemptions}` : ''}
                       </td>
                       <td>
-                        {expired ? <Badge tone="grey">{t('Caducado', 'Expired')}</Badge> : c.active ? <Badge tone="green">{t('Activo', 'Active')}</Badge> : <Badge tone="grey">{t('Inactivo', 'Inactive')}</Badge>}
+                        {expired ? (
+                          <Badge tone="grey">{t('Caducado', 'Expired')}</Badge>
+                        ) : c.active ? (
+                          <Badge tone="green">{t('Activo', 'Active')}</Badge>
+                        ) : (
+                          <Badge tone="grey">{t('Inactivo', 'Inactive')}</Badge>
+                        )}
                         {c.public ? (
                           <>
                             {' '}

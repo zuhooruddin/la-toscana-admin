@@ -7,14 +7,16 @@ import { useAuth } from '@/lib/auth';
 import { DAY_LABEL, formatEur, readinessLabel } from '@/lib/format';
 import type { AdminBranch, DeliveryZone, Interval } from '@/lib/types';
 import { useBranchSave } from './use-save';
+import { intlLocale, useT } from '@/lib/i18n';
 
 type Props = { branch: AdminBranch & { readiness: { ordering: string[]; reservations: string[] } }; onSaved: () => void };
 
 function SaveBar({ busy, onSave, disabled }: { busy: boolean; onSave: () => void; disabled?: boolean }) {
+  const t = useT();
   return (
     <div className="form-actions">
       <Button variant="primary" icon="check" loading={busy} disabled={disabled} onClick={onSave}>
-        Guardar
+        {t('Guardar', 'Save')}
       </Button>
     </div>
   );
@@ -22,6 +24,7 @@ function SaveBar({ busy, onSave, disabled }: { busy: boolean; onSave: () => void
 
 // ---------------------------------------------------------------- general
 export function GeneralTab({ branch: b, onSaved }: Props) {
+  const t = useT();
   const { can } = useAuth();
   const { save, busy, error } = useBranchSave(b.id, onSaved);
   const [f, setF] = useState({
@@ -44,43 +47,53 @@ export function GeneralTab({ branch: b, onSaved }: Props) {
   return (
     <fieldset disabled={ro} style={{ border: 0, padding: 0, margin: 0 }}>
       <div className="grid-2" style={{ alignItems: 'start' }}>
-        <Card title="Local">
+        <Card title={t('Local', 'Venue')}>
           <div className="stack">
             {error ? <Alert tone="danger">{error}</Alert> : null}
-            <TextField label="Nombre" value={f.name} onChange={(e) => set({ name: e.target.value })} required />
-            <TextField label="Dirección" value={f.line1} onChange={(e) => set({ line1: e.target.value })} required />
+            <TextField label={t('Nombre', 'Name')} value={f.name} onChange={(e) => set({ name: e.target.value })} required />
+            <TextField label={t('Dirección', 'Address')} value={f.line1} onChange={(e) => set({ line1: e.target.value })} required />
             <div className="grid-2">
-              <TextField label="Ciudad" value={f.city} onChange={(e) => set({ city: e.target.value })} required />
-              <TextField label="Código postal" value={f.postcode} maxLength={5} inputMode="numeric" onChange={(e) => set({ postcode: e.target.value })} />
+              <TextField label={t('Ciudad', 'City')} value={f.city} onChange={(e) => set({ city: e.target.value })} required />
+              <TextField
+                label={t('Código postal', 'Postcode')}
+                value={f.postcode}
+                maxLength={5}
+                inputMode="numeric"
+                onChange={(e) => set({ postcode: e.target.value })}
+              />
             </div>
             <div className="grid-2">
               <TextField
-                label="Latitud"
+                label={t('Latitud', 'Latitude')}
                 value={f.lat}
                 inputMode="decimal"
                 onChange={(e) => set({ lat: e.target.value })}
-                hint="Para «cómo llegar» y el restaurante más cercano"
+                hint={t('Para «cómo llegar» y el restaurante más cercano', 'For directions and the nearest restaurant')}
               />
               <TextField
-                label="Longitud"
+                label={t('Longitud', 'Longitude')}
                 value={f.lng}
                 inputMode="decimal"
                 onChange={(e) => set({ lng: e.target.value })}
-                error={geoValid ? null : 'Coordenadas no válidas'}
+                error={geoValid ? null : t('Coordenadas no válidas', 'Invalid coordinates')}
               />
             </div>
-            <ImageInput label="Foto del local" value={f.imageUrl} onChange={(imageUrl) => set({ imageUrl })} />
-            <Toggle label="Publicado en la web y la app" checked={f.published} onChange={(published) => set({ published })} />
+            <ImageInput label={t('Foto del local', 'Venue photo')} value={f.imageUrl} onChange={(imageUrl) => set({ imageUrl })} />
+            <Toggle
+              label={t('Publicado en la web y la app', 'Published on the website and app')}
+              checked={f.published}
+              onChange={(published) => set({ published })}
+            />
           </div>
         </Card>
-        <Card title="Contacto">
+        <Card title={t('Contacto', 'Contact')}>
           <div className="stack">
-            <TextField label="Teléfono" value={f.phone} type="tel" onChange={(e) => set({ phone: e.target.value })} />
+            <TextField label={t('Teléfono', 'Phone')} value={f.phone} type="tel" onChange={(e) => set({ phone: e.target.value })} />
             <TextField label="WhatsApp" value={f.whatsapp} type="tel" onChange={(e) => set({ whatsapp: e.target.value })} />
-            <TextField label="Correo" value={f.email} type="email" onChange={(e) => set({ email: e.target.value })} />
+            <TextField label={t('Correo', 'Email')} value={f.email} type="email" onChange={(e) => set({ email: e.target.value })} />
             <Toggle
-              label="Datos de contacto verificados"
-              hint="Necesario para activar los pedidos online."
+              label={t('Datos de contacto verificados', 'Contact details verified')}
+              hint={t('Necesario para activar los pedidos online.', 'Required to enable online orders.')}
               checked={f.verified}
               onChange={(verified) => set({ verified })}
             />
@@ -114,15 +127,16 @@ export function GeneralTab({ branch: b, onSaved }: Props) {
 
 // ---------------------------------------------------------------- hours
 function IntervalsEditor({ value, onChange }: { value: Interval[]; onChange: (v: Interval[]) => void }) {
+  const t = useT();
   return (
     <div>
-      {value.length === 0 ? <span className="muted">Cerrado</span> : null}
+      {value.length === 0 ? <span className="muted">{t('Cerrado', 'Closed')}</span> : null}
       {value.map((iv, i) => (
         <span key={i} className="interval">
           <input
             className="input"
             type="time"
-            aria-label="Abre"
+            aria-label={t('Abre', 'Opens')}
             value={iv.open}
             onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, open: e.target.value } : x)))}
           />
@@ -130,11 +144,16 @@ function IntervalsEditor({ value, onChange }: { value: Interval[]; onChange: (v:
           <input
             className="input"
             type="time"
-            aria-label="Cierra"
+            aria-label={t('Cierra', 'Closes')}
             value={iv.close}
             onChange={(e) => onChange(value.map((x, j) => (j === i ? { ...x, close: e.target.value } : x)))}
           />
-          <button type="button" className="icon-btn" aria-label="Quitar franja" onClick={() => onChange(value.filter((_, j) => j !== i))}>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label={t('Quitar franja', 'Remove time range')}
+            onClick={() => onChange(value.filter((_, j) => j !== i))}
+          >
             ×
           </button>
         </span>
@@ -144,6 +163,7 @@ function IntervalsEditor({ value, onChange }: { value: Interval[]; onChange: (v:
 }
 
 export function HoursTab({ branch: b, onSaved }: Props) {
+  const t = useT();
   const { can } = useAuth();
   const { save, busy, error } = useBranchSave(b.id, onSaved);
   const [hours, setHours] = useState(() => [1, 2, 3, 4, 5, 6, 7].map((day) => ({ day, intervals: b.hours.find((h) => h.day === day)?.intervals ?? [] })));
@@ -155,10 +175,13 @@ export function HoursTab({ branch: b, onSaved }: Props) {
   return (
     <fieldset disabled={ro} style={{ border: 0, padding: 0, margin: 0 }}>
       <div className="grid-2" style={{ gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr)', alignItems: 'start' }}>
-        <Card title="Horario semanal">
+        <Card title={t('Horario semanal', 'Weekly hours')}>
           {error ? <Alert tone="danger">{error}</Alert> : null}
           <p className="muted small" style={{ marginBottom: 8 }}>
-            Hora de España. Una franja que cierra después de medianoche (ej. 20:00–01:00) cuenta para el día en que abre.
+            {t(
+              'Hora de España. Una franja que cierra después de medianoche (ej. 20:00–01:00) cuenta para el día en que abre.',
+              'Spain time. A range that closes after midnight (e.g. 20:00–01:00) counts for the day it opens.',
+            )}
           </p>
           {hours.map((h, i) => (
             <div key={h.day} className="hours-row">
@@ -171,25 +194,35 @@ export function HoursTab({ branch: b, onSaved }: Props) {
                 disabled={h.intervals.length >= 4}
                 onClick={() => setHours(hours.map((x, j) => (j === i ? { ...x, intervals: [...x.intervals, { open: '13:00', close: '16:00' }] } : x)))}
               >
-                Franja
+                {t('Franja', 'Range')}
               </Button>
             </div>
           ))}
           <div style={{ marginTop: 12 }}>
             <Toggle
-              label="Horario verificado"
-              hint="Confirma que este es el horario real. Necesario para pedidos y reservas online."
+              label={t('Horario verificado', 'Hours verified')}
+              hint={t(
+                'Confirma que este es el horario real. Necesario para pedidos y reservas online.',
+                'Confirms this is the real schedule. Required for online orders and reservations.',
+              )}
               checked={verified}
               onChange={setVerified}
             />
           </div>
         </Card>
-        <Card title="Cierres y horarios especiales">
+        <Card title={t('Cierres y horarios especiales', 'Closures and special hours')}>
           <p className="muted small" style={{ marginBottom: 10 }}>
-            Festivos, vacaciones o días con horario distinto.
+            {t('Festivos, vacaciones o días con horario distinto.', 'Holidays, vacations or days with different hours.')}
           </p>
           <div className="row" style={{ marginBottom: 12 }}>
-            <input className="input" type="date" aria-label="Fecha" value={exDate} onChange={(e) => setExDate(e.target.value)} style={{ width: 'auto' }} />
+            <input
+              className="input"
+              type="date"
+              aria-label={t('Fecha', 'Date')}
+              value={exDate}
+              onChange={(e) => setExDate(e.target.value)}
+              style={{ width: 'auto' }}
+            />
             <Button
               size="sm"
               icon="plus"
@@ -199,18 +232,23 @@ export function HoursTab({ branch: b, onSaved }: Props) {
                 setExDate('')
               )}
             >
-              Añadir día
+              {t('Añadir día', 'Add day')}
             </Button>
           </div>
           <div className="stack" style={{ gap: 10 }}>
-            {exceptions.length === 0 ? <p className="muted">Sin días especiales.</p> : null}
+            {exceptions.length === 0 ? <p className="muted">{t('Sin días especiales.', 'No special days.')}</p> : null}
             {exceptions.map((x, i) => (
               <div key={x.date} className="card" style={{ background: 'var(--surface-2)', padding: 12 }}>
                 <div className="row-between">
                   <strong>
-                    {new Date(`${x.date}T12:00:00Z`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                    {new Date(`${x.date}T12:00:00Z`).toLocaleDateString(intlLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   </strong>
-                  <button type="button" className="icon-btn" aria-label="Quitar día" onClick={() => setExceptions(exceptions.filter((_, j) => j !== i))}>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label={t('Quitar día', 'Remove day')}
+                    onClick={() => setExceptions(exceptions.filter((_, j) => j !== i))}
+                  >
                     ×
                   </button>
                 </div>
@@ -232,7 +270,7 @@ export function HoursTab({ branch: b, onSaved }: Props) {
                       )
                     }
                   />
-                  Cerrado todo el día
+                  {t('Cerrado todo el día', 'Closed all day')}
                 </label>
                 {!x.closed ? (
                   <IntervalsEditor
@@ -243,7 +281,7 @@ export function HoursTab({ branch: b, onSaved }: Props) {
                 <input
                   className="input"
                   style={{ marginTop: 8 }}
-                  placeholder="Nota (ej. Festivo local)"
+                  placeholder={t('Nota (ej. Festivo local)', 'Note (e.g. Local holiday)')}
                   maxLength={200}
                   value={x.note ?? ''}
                   onChange={(e) => setExceptions(exceptions.map((y, j) => (j === i ? { ...y, note: e.target.value } : y)))}
@@ -277,6 +315,7 @@ export function HoursTab({ branch: b, onSaved }: Props) {
 
 // ---------------------------------------------------------------- ordering & payments
 export function OrderingTab({ branch: b, onSaved }: Props) {
+  const t = useT();
   const { can } = useAuth();
   const { save, busy, error } = useBranchSave(b.id, onSaved);
   const [f, setF] = useState({
@@ -294,50 +333,65 @@ export function OrderingTab({ branch: b, onSaved }: Props) {
   return (
     <fieldset disabled={ro} style={{ border: 0, padding: 0, margin: 0 }}>
       <div className="grid-2" style={{ alignItems: 'start' }}>
-        <Card title="Pedidos online">
+        <Card title={t('Pedidos online', 'Online orders')}>
           {error ? <Alert tone="danger">{error}</Alert> : null}
           {b.readiness.ordering.length ? (
-            <Alert tone="warning" title="Antes de activar los pedidos falta:">
+            <Alert tone="warning" title={t('Antes de activar los pedidos falta:', 'Before enabling orders, the following is missing:')}>
               {b.readiness.ordering.map(readinessLabel).join(', ')}
             </Alert>
           ) : null}
-          <Toggle label="Aceptar pedidos online" hint="Web y app de clientes" checked={f.enabled} onChange={(enabled) => set({ enabled })} />
           <Toggle
-            label="Permitir pedidos programados"
-            hint="El cliente puede elegir hora (también cuando el local está cerrado)."
+            label={t('Aceptar pedidos online', 'Accept online orders')}
+            hint={t('Web y app de clientes', 'Customer website and app')}
+            checked={f.enabled}
+            onChange={(enabled) => set({ enabled })}
+          />
+          <Toggle
+            label={t('Permitir pedidos programados', 'Allow scheduled orders')}
+            hint={t(
+              'El cliente puede elegir hora (también cuando el local está cerrado).',
+              'The customer can choose a time (also when the restaurant is closed).',
+            )}
             checked={f.scheduledOrders}
             onChange={(scheduledOrders) => set({ scheduledOrders })}
           />
           <TextField
-            label="Tiempo de preparación (minutos)"
+            label={t('Tiempo de preparación (minutos)', 'Preparation time (minutes)')}
             type="number"
             min={0}
             max={240}
             value={f.prep}
             onChange={(e) => set({ prep: Number(e.target.value) })}
-            hint="Se usa para la hora estimada y la primera hora programable."
+            hint={t('Se usa para la hora estimada y la primera hora programable.', 'Used for the estimated time and the first schedulable time.')}
           />
         </Card>
         <div className="stack">
-          <Card title="Servicios">
-            <Toggle label="Recogida en el local" checked={f.pickup} onChange={(pickup) => set({ pickup })} />
+          <Card title={t('Servicios', 'Services')}>
+            <Toggle label={t('Recogida en el local', 'Pickup at the restaurant')} checked={f.pickup} onChange={(pickup) => set({ pickup })} />
             <Toggle
-              label="Reparto a domicilio"
-              hint="Configura las zonas en la pestaña «Reparto»."
+              label={t('Reparto a domicilio', 'Home delivery')}
+              hint={t('Configura las zonas en la pestaña «Reparto».', 'Set up the zones in the “Delivery” tab.')}
               checked={f.delivery}
               onChange={(delivery) => set({ delivery })}
             />
-            <Toggle label="Consumo en el local" checked={f.dineIn} onChange={(dineIn) => set({ dineIn })} />
+            <Toggle label={t('Consumo en el local', 'Dine-in')} checked={f.dineIn} onChange={(dineIn) => set({ dineIn })} />
           </Card>
-          <Card title="Métodos de pago">
-            <Toggle label="Efectivo" hint="Al recoger o al recibir el pedido" checked={f.cash} onChange={(cash) => set({ cash })} />
+          <Card title={t('Métodos de pago', 'Payment methods')}>
             <Toggle
-              label="Tarjeta online (Stripe)"
-              hint="Requiere las claves de Stripe en Ajustes → Pagos."
+              label={t('Efectivo', 'Cash')}
+              hint={t('Al recoger o al recibir el pedido', 'On pickup or when receiving the order')}
+              checked={f.cash}
+              onChange={(cash) => set({ cash })}
+            />
+            <Toggle
+              label={t('Tarjeta online (Stripe)', 'Online card (Stripe)')}
+              hint={t('Requiere las claves de Stripe en Ajustes → Pagos.', 'Requires the Stripe keys in Settings → Payments.')}
               checked={f.card}
               onChange={(card) => set({ card })}
             />
-            <p className="muted small">Bizum no está disponible hasta configurar un proveedor real.</p>
+            <p className="muted small">
+              {t('Bizum no está disponible hasta configurar un proveedor real.', 'Bizum is not available until a real provider is configured.')}
+            </p>
           </Card>
         </div>
       </div>
@@ -359,6 +413,7 @@ export function OrderingTab({ branch: b, onSaved }: Props) {
 
 // ---------------------------------------------------------------- delivery zones
 export function DeliveryTab({ branch: b, onSaved }: Props) {
+  const t = useT();
   const { can } = useAuth();
   const { save, busy, error } = useBranchSave(b.id, onSaved);
   const [zones, setZones] = useState<DeliveryZone[]>(b.delivery?.zones ?? []);
@@ -369,31 +424,43 @@ export function DeliveryTab({ branch: b, onSaved }: Props) {
   return (
     <fieldset disabled={ro} style={{ border: 0, padding: 0, margin: 0 }}>
       <Card
-        title="Zonas de reparto"
+        title={t('Zonas de reparto', 'Delivery zones')}
         actions={
           <Button
             size="sm"
             icon="plus"
             onClick={() => setZones([...zones, { name: '', postcodes: [], feeCents: 0, minOrderCents: 0, etaMinutes: 45, active: true }])}
           >
-            Añadir zona
+            {t('Añadir zona', 'Add zone')}
           </Button>
         }
       >
         <div className="stack">
           {error ? <Alert tone="danger">{error}</Alert> : null}
           {!b.services.delivery ? (
-            <Alert tone="info">El reparto está desactivado en «Pedidos y pagos». Puedes preparar las zonas antes de activarlo.</Alert>
+            <Alert tone="info">
+              {t(
+                'El reparto está desactivado en «Pedidos y pagos». Puedes preparar las zonas antes de activarlo.',
+                'Delivery is disabled under “Orders & payments”. You can prepare the zones before enabling it.',
+              )}
+            </Alert>
           ) : null}
-          {zones.length === 0 ? <p className="muted">Sin zonas. El reparto solo se ofrece en los códigos postales de una zona activa.</p> : null}
+          {zones.length === 0 ? (
+            <p className="muted">
+              {t(
+                'Sin zonas. El reparto solo se ofrece en los códigos postales de una zona activa.',
+                'No zones. Delivery is only offered at the postcodes of an active zone.',
+              )}
+            </p>
+          ) : null}
           {zones.map((z, i) => (
             <div key={i} className="card" style={{ background: 'var(--surface-2)' }}>
               <div className="grid-4">
-                <TextField label="Nombre de la zona" value={z.name} onChange={(e) => setZone(i, { name: e.target.value })} />
-                <MoneyInput label="Gastos de envío" cents={z.feeCents} onChange={(feeCents) => setZone(i, { feeCents })} />
-                <MoneyInput label="Pedido mínimo" cents={z.minOrderCents} onChange={(minOrderCents) => setZone(i, { minOrderCents })} />
+                <TextField label={t('Nombre de la zona', 'Zone name')} value={z.name} onChange={(e) => setZone(i, { name: e.target.value })} />
+                <MoneyInput label={t('Gastos de envío', 'Delivery fee')} cents={z.feeCents} onChange={(feeCents) => setZone(i, { feeCents })} />
+                <MoneyInput label={t('Pedido mínimo', 'Minimum order')} cents={z.minOrderCents} onChange={(minOrderCents) => setZone(i, { minOrderCents })} />
                 <TextField
-                  label="Tiempo estimado (min)"
+                  label={t('Tiempo estimado (min)', 'Estimated time (min)')}
                   type="number"
                   min={5}
                   max={240}
@@ -401,7 +468,10 @@ export function DeliveryTab({ branch: b, onSaved }: Props) {
                   onChange={(e) => setZone(i, { etaMinutes: Number(e.target.value) })}
                 />
               </div>
-              <Field label="Códigos postales" hint="Separados por comas o espacios (5 cifras).">
+              <Field
+                label={t('Códigos postales', 'Postcodes')}
+                hint={t('Separados por comas o espacios (5 cifras).', 'Separated by commas or spaces (5 digits).')}
+              >
                 <input
                   className="input"
                   defaultValue={z.postcodes.join(', ')}
@@ -423,20 +493,23 @@ export function DeliveryTab({ branch: b, onSaved }: Props) {
               <div className="row-between" style={{ marginTop: 8 }}>
                 <label className="checkbox">
                   <input type="checkbox" checked={z.active} onChange={(e) => setZone(i, { active: e.target.checked })} />
-                  Zona activa
+                  {t('Zona activa', 'Active zone')}
                 </label>
                 <span className="muted small">
-                  {z.postcodes.length} CP · envío {formatEur(z.feeCents)} · mínimo {formatEur(z.minOrderCents)}
+                  {t(
+                    `${z.postcodes.length} CP · envío ${formatEur(z.feeCents)} · mínimo ${formatEur(z.minOrderCents)}`,
+                    `${z.postcodes.length} postcodes · delivery ${formatEur(z.feeCents)} · minimum ${formatEur(z.minOrderCents)}`,
+                  )}
                 </span>
                 <Button size="sm" variant="ghost" icon="trash" onClick={() => setZones(zones.filter((_, j) => j !== i))}>
-                  Quitar
+                  {t('Quitar', 'Remove')}
                 </Button>
               </div>
             </div>
           ))}
           <Toggle
-            label="El repartidor debe aceptar cada entrega"
-            hint="Si se desactiva, el pedido queda aceptado al asignarlo."
+            label={t('El repartidor debe aceptar cada entrega', 'The driver must accept each delivery')}
+            hint={t('Si se desactiva, el pedido queda aceptado al asignarlo.', 'If disabled, the order is accepted as soon as it is assigned.')}
             checked={requireAccept}
             onChange={setRequireAccept}
           />
@@ -469,6 +542,7 @@ export function DeliveryTab({ branch: b, onSaved }: Props) {
 
 // ---------------------------------------------------------------- reservations
 export function ReservationsTab({ branch: b, onSaved }: Props) {
+  const t = useT();
   const { can } = useAuth();
   const { save, busy, error } = useBranchSave(b.id, onSaved);
   const [f, setF] = useState(b.reservations);
@@ -476,19 +550,23 @@ export function ReservationsTab({ branch: b, onSaved }: Props) {
   const ro = !can('branch:write');
   return (
     <fieldset disabled={ro} style={{ border: 0, padding: 0, margin: 0 }}>
-      <Card title="Reservas online">
+      <Card title={t('Reservas online', 'Online reservations')}>
         <div className="stack">
           {error ? <Alert tone="danger">{error}</Alert> : null}
-          {b.readiness.reservations.length ? <Alert tone="warning">Falta: {b.readiness.reservations.map(readinessLabel).join(', ')}</Alert> : null}
+          {b.readiness.reservations.length ? (
+            <Alert tone="warning">
+              {t('Falta', 'Missing')}: {b.readiness.reservations.map(readinessLabel).join(', ')}
+            </Alert>
+          ) : null}
           <Toggle
-            label="Aceptar reservas online"
-            hint="Se confirman automáticamente hasta la capacidad indicada."
+            label={t('Aceptar reservas online', 'Accept online reservations')}
+            hint={t('Se confirman automáticamente hasta la capacidad indicada.', 'They are confirmed automatically up to the stated capacity.')}
             checked={f.enabled}
             onChange={(enabled) => set({ enabled })}
           />
           <div className="grid-3">
             <TextField
-              label="Comensales por franja"
+              label={t('Comensales por franja', 'Guests per time slot')}
               type="number"
               min={0}
               max={500}
@@ -496,7 +574,7 @@ export function ReservationsTab({ branch: b, onSaved }: Props) {
               onChange={(e) => set({ capacityPerSlot: Number(e.target.value) })}
             />
             <TextField
-              label="Duración de la franja (min)"
+              label={t('Duración de la franja (min)', 'Slot length (min)')}
               type="number"
               min={15}
               max={120}
@@ -505,7 +583,7 @@ export function ReservationsTab({ branch: b, onSaved }: Props) {
               onChange={(e) => set({ slotMinutes: Number(e.target.value) })}
             />
             <TextField
-              label="Máx. personas por reserva"
+              label={t('Máx. personas por reserva', 'Max. guests per reservation')}
               type="number"
               min={1}
               max={50}
@@ -513,14 +591,14 @@ export function ReservationsTab({ branch: b, onSaved }: Props) {
               onChange={(e) => set({ maxPartySize: Number(e.target.value) })}
             />
             <TextField
-              label="Antelación mínima (min)"
+              label={t('Antelación mínima (min)', 'Minimum lead time (min)')}
               type="number"
               min={0}
               value={f.minLeadMinutes}
               onChange={(e) => set({ minLeadMinutes: Number(e.target.value) })}
             />
             <TextField
-              label="Días máximos de antelación"
+              label={t('Días máximos de antelación', 'Maximum days ahead')}
               type="number"
               min={1}
               max={365}

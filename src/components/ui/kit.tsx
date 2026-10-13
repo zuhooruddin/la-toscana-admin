@@ -291,9 +291,7 @@ export function Pagination({ page, pageSize, total, onPage }: { page: number; pa
       <Button size="sm" variant="ghost" icon="left" disabled={page <= 1} onClick={() => onPage(page - 1)}>
         {t('Anterior', 'Previous')}
       </Button>
-      <span className="muted">
-        {t(`Página ${page} de ${pages} · ${total} resultados`, `Page ${page} of ${pages} · ${total} results`)}
-      </span>
+      <span className="muted">{t(`Página ${page} de ${pages} · ${total} resultados`, `Page ${page} of ${pages} · ${total} results`)}</span>
       <Button size="sm" variant="ghost" disabled={page >= pages} onClick={() => onPage(page + 1)}>
         {t('Siguiente', 'Next')}
         <Icon name="right" size={15} />
@@ -353,17 +351,7 @@ export function Modal({
   );
 }
 
-export function SearchInput({
-  value,
-  onChange,
-  placeholder,
-  label,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  label?: string;
-}) {
+export function SearchInput({ value, onChange, placeholder, label }: { value: string; onChange: (v: string) => void; placeholder?: string; label?: string }) {
   const t = useT();
   return (
     <label className="search">

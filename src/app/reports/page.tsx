@@ -24,7 +24,10 @@ export default function ReportsPage() {
   const s = r.data;
   const csv = () => {
     if (!s) return;
-    const rows = [[t('Producto', 'Product'), t('Unidades', 'Units'), t('Ventas (EUR)', 'Sales (EUR)')], ...s.topItems.map((i) => [i.name, String(i.quantity), (i.revenueCents / 100).toFixed(2)])];
+    const rows = [
+      [t('Producto', 'Product'), t('Unidades', 'Units'), t('Ventas (EUR)', 'Sales (EUR)')],
+      ...s.topItems.map((i) => [i.name, String(i.quantity), (i.revenueCents / 100).toFixed(2)]),
+    ];
     const blob = new Blob([rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(';')).join('\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -34,7 +37,10 @@ export default function ReportsPage() {
   };
   return (
     <>
-      <PageHeader title={t('Informes', 'Reports')} subtitle={t('Ventas reales a partir de los pedidos (IVA incluido). Hora de España.', 'Actual sales from orders (VAT included). Spain time.')} />
+      <PageHeader
+        title={t('Informes', 'Reports')}
+        subtitle={t('Ventas reales a partir de los pedidos (IVA incluido). Hora de España.', 'Actual sales from orders (VAT included). Spain time.')}
+      />
       <div className="filters">
         {RANGES.map((x) => (
           <button
@@ -68,12 +74,19 @@ export default function ReportsPage() {
               tone="green"
               label={t('Ventas netas', 'Net sales')}
               value={formatEur(s.netCents)}
-              hint={t(`Bruto ${formatEur(s.grossCents)} · reembolsado ${formatEur(s.refundedCents)}`, `Gross ${formatEur(s.grossCents)} · refunded ${formatEur(s.refundedCents)}`)}
+              hint={t(
+                `Bruto ${formatEur(s.grossCents)} · reembolsado ${formatEur(s.refundedCents)}`,
+                `Gross ${formatEur(s.grossCents)} · refunded ${formatEur(s.refundedCents)}`,
+              )}
             />
             <Stat icon="tag" tone="amber" label={t('Ticket medio', 'Average ticket')} value={formatEur(s.averageTicketCents)} />
             <Stat icon="truck" tone="red" label={t('Pedidos a domicilio', 'Delivery orders')} value={`${Math.round(s.deliveryShare * 100)} %`} />
           </div>
-          {s.simulatedCents ? <Alert tone="warning">{formatEur(s.simulatedCents)} {t('corresponden a pagos con tarjeta simulados (modo de pruebas).', 'are simulated card payments (test mode).')}</Alert> : null}
+          {s.simulatedCents ? (
+            <Alert tone="warning">
+              {formatEur(s.simulatedCents)} {t('corresponden a pagos con tarjeta simulados (modo de pruebas).', 'are simulated card payments (test mode).')}
+            </Alert>
+          ) : null}
           <div className="grid-2" style={{ alignItems: 'start' }}>
             <Card title={t('Productos más vendidos', 'Top products')} padded={false}>
               {s.topItems.length === 0 ? (

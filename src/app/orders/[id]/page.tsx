@@ -117,7 +117,9 @@ export default function OrderDetailPage() {
       />
       {o.payment.simulated ? (
         <div style={{ marginBottom: 16 }}>
-          <Alert tone="warning">{t('Pago con tarjeta simulado (modo de pruebas): no se ha cobrado dinero real.', 'Simulated card payment (test mode): no real money was charged.')}</Alert>
+          <Alert tone="warning">
+            {t('Pago con tarjeta simulado (modo de pruebas): no se ha cobrado dinero real.', 'Simulated card payment (test mode): no real money was charged.')}
+          </Alert>
         </div>
       ) : null}
       <div className="grid-2" style={{ gridTemplateColumns: 'minmax(0,1.4fr) minmax(0,1fr)', alignItems: 'start' }}>
@@ -369,7 +371,12 @@ function CancelModal({ open, onClose, onConfirm, busy }: { open: boolean; onClos
       }
     >
       <div className="stack">
-        <p className="muted">{t('El cliente verá el pedido como cancelado. Si pagó con tarjeta, haz después el reembolso.', 'The customer will see the order as cancelled. If they paid by card, issue the refund afterwards.')}</p>
+        <p className="muted">
+          {t(
+            'El cliente verá el pedido como cancelado. Si pagó con tarjeta, haz después el reembolso.',
+            'The customer will see the order as cancelled. If they paid by card, issue the refund afterwards.',
+          )}
+        </p>
         <TextArea
           label={t('Motivo (obligatorio)', 'Reason (required)')}
           value={reason}
@@ -424,8 +431,14 @@ function RefundModal({ open, onClose, order, max, onDone }: { open: boolean; onC
       <div className="stack">
         <Alert tone="info">
           {order.payment.method === 'card'
-            ? t('Se devolverá a la tarjeta del cliente a través de la pasarela de pago.', "It will be returned to the customer's card through the payment gateway.")
-            : t('Pago en efectivo: se registra el reembolso manual. Devuelve el dinero en el local.', 'Cash payment: the refund is recorded manually. Return the money at the restaurant.')}
+            ? t(
+                'Se devolverá a la tarjeta del cliente a través de la pasarela de pago.',
+                "It will be returned to the customer's card through the payment gateway.",
+              )
+            : t(
+                'Pago en efectivo: se registra el reembolso manual. Devuelve el dinero en el local.',
+                'Cash payment: the refund is recorded manually. Return the money at the restaurant.',
+              )}
         </Alert>
         <TextField
           label={t(`Importe (máx. ${formatEur(max)})`, `Amount (max. ${formatEur(max)})`)}
@@ -483,7 +496,12 @@ function DriverModal({ open, onClose, order, onDone }: { open: boolean; onClose:
       {drivers.loading ? (
         <Spinner />
       ) : list.length === 0 ? (
-        <Alert tone="warning">{t('No hay repartidores activos en este restaurante. Créalos en «Equipo y permisos».', 'There are no active drivers at this restaurant. Create them under “Team & permissions”.')}</Alert>
+        <Alert tone="warning">
+          {t(
+            'No hay repartidores activos en este restaurante. Créalos en «Equipo y permisos».',
+            'There are no active drivers at this restaurant. Create them under “Team & permissions”.',
+          )}
+        </Alert>
       ) : (
         <SelectField label={t('Repartidor', 'Driver')} value={driverId} onChange={(e) => setDriverId(e.target.value)}>
           <option value="">{t('Elige…', 'Choose…')}</option>

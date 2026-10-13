@@ -1,4 +1,5 @@
 import { cleanGroup, slugify } from '@/components/forms';
+import { tr } from '@/lib/i18n';
 import type { MenuItem } from '@/lib/types';
 
 export type Draft = Omit<MenuItem, '_id' | 'kind'> & { _id?: string; kind?: MenuItem['kind'] };
@@ -26,13 +27,13 @@ export const emptyItem = (categoryKey = ''): Draft => ({
 
 export function validate(d: Draft): string[] {
   const errs: string[] = [];
-  if (!d.name.es?.trim()) errs.push('El nombre en español es obligatorio.');
-  if (!d.categoryKey) errs.push('Elige una categoría.');
-  if (d.priceCents < 0) errs.push('El precio no puede ser negativo.');
+  if (!d.name.es?.trim()) errs.push(tr('El nombre en español es obligatorio.', 'The Spanish name is required.'));
+  if (!d.categoryKey) errs.push(tr('Elige una categoría.', 'Choose a category.'));
+  if (d.priceCents < 0) errs.push(tr('El precio no puede ser negativo.', 'The price cannot be negative.'));
   for (const g of d.optionGroups) {
-    if (!g.name.es?.trim()) errs.push('Cada grupo de opciones necesita un nombre.');
-    if (g.min > g.max) errs.push(`«${g.name.es}»: el mínimo es mayor que el máximo.`);
-    if (!g.choices.some((c) => c.name.es?.trim())) errs.push(`«${g.name.es}»: añade al menos una opción.`);
+    if (!g.name.es?.trim()) errs.push(tr('Cada grupo de opciones necesita un nombre.', 'Each option group needs a name.'));
+    if (g.min > g.max) errs.push(tr(`«${g.name.es}»: el mínimo es mayor que el máximo.`, `“${g.name.es}”: the minimum is greater than the maximum.`));
+    if (!g.choices.some((c) => c.name.es?.trim())) errs.push(tr(`«${g.name.es}»: añade al menos una opción.`, `“${g.name.es}”: add at least one option.`));
   }
   return errs;
 }

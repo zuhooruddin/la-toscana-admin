@@ -23,7 +23,10 @@ export default function ModifiersPage() {
     <>
       <PageHeader
         title={t('Extras y opciones', 'Extras & options')}
-        subtitle={t('Grupos compartidos por varios productos: suplementos, ingredientes extra, acompañamientos…', 'Groups shared by several products: supplements, extra ingredients, sides…')}
+        subtitle={t(
+          'Grupos compartidos por varios productos: suplementos, ingredientes extra, acompañamientos…',
+          'Groups shared by several products: supplements, extra ingredients, sides…',
+        )}
         actions={
           can('menu:write') ? (
             <Button
@@ -61,7 +64,11 @@ export default function ModifiersPage() {
                 }
               >
                 <div className="row" style={{ marginBottom: 10 }}>
-                  {g.published === false ? <Badge tone="grey">{t('Oculto a clientes', 'Hidden from customers')}</Badge> : <Badge tone="green">{t('Visible', 'Visible')}</Badge>}
+                  {g.published === false ? (
+                    <Badge tone="grey">{t('Oculto a clientes', 'Hidden from customers')}</Badge>
+                  ) : (
+                    <Badge tone="green">{t('Visible', 'Visible')}</Badge>
+                  )}
                   <Badge tone="blue">
                     {t('Elegir', 'Choose')} {g.min}–{g.max}
                   </Badge>
@@ -79,8 +86,16 @@ export default function ModifiersPage() {
                       {c.priceDeltaCents ? <span className="muted"> +{formatEur(c.priceDeltaCents)}</span> : null}
                     </span>
                   ))}
-                  {active.length > 24 ? <span className="muted small">+{active.length - 24} {t('más', 'more')}</span> : null}
-                  {g.choices.length - active.length ? <span className="muted small">{g.choices.length - active.length} {t('en borrador', 'in draft')}</span> : null}
+                  {active.length > 24 ? (
+                    <span className="muted small">
+                      +{active.length - 24} {t('más', 'more')}
+                    </span>
+                  ) : null}
+                  {g.choices.length - active.length ? (
+                    <span className="muted small">
+                      {g.choices.length - active.length} {t('en borrador', 'in draft')}
+                    </span>
+                  ) : null}
                 </div>
               </Card>
             );
@@ -135,7 +150,14 @@ function GroupModal({ initial, isNew, onClose, onSaved }: { initial: OptionGroup
     >
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        {!isNew ? <Alert tone="info">{t('Este grupo se usa en varios productos: los cambios se aplican a todos.', 'This group is used in several products: changes apply to all of them.')}</Alert> : null}
+        {!isNew ? (
+          <Alert tone="info">
+            {t(
+              'Este grupo se usa en varios productos: los cambios se aplican a todos.',
+              'This group is used in several products: changes apply to all of them.',
+            )}
+          </Alert>
+        ) : null}
         <GroupEditor group={g} onChange={setG} lockKey={!isNew} />
       </div>
     </Modal>

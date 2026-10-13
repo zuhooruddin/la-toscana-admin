@@ -44,7 +44,11 @@ export function PauseControl({ branch, onChanged }: { branch: AdminBranch; onCha
         method: 'POST',
         body: p ? { paused: true, minutes: minutes ? Number(minutes) : undefined, reason: reason || undefined } : { paused: false },
       });
-      toast(p ? t(`Pedidos en pausa en ${branch.name}`, `Orders paused at ${branch.name}`) : t(`${branch.name} vuelve a aceptar pedidos`, `${branch.name} is accepting orders again`));
+      toast(
+        p
+          ? t(`Pedidos en pausa en ${branch.name}`, `Orders paused at ${branch.name}`)
+          : t(`${branch.name} vuelve a aceptar pedidos`, `${branch.name} is accepting orders again`),
+      );
       setOpen(false);
       onChanged();
     } catch (e) {
@@ -82,7 +86,12 @@ export function PauseControl({ branch, onChanged }: { branch: AdminBranch; onCha
         }
       >
         <div className="stack">
-          <p className="muted">{t('La web y la app dejarán de aceptar pedidos nuevos. Los pedidos ya recibidos no cambian.', 'The website and app will stop accepting new orders. Orders already received are not affected.')}</p>
+          <p className="muted">
+            {t(
+              'La web y la app dejarán de aceptar pedidos nuevos. Los pedidos ya recibidos no cambian.',
+              'The website and app will stop accepting new orders. Orders already received are not affected.',
+            )}
+          </p>
           <SelectField label={t('Duración', 'Duration')} value={minutes} onChange={(e) => setMinutes(e.target.value)}>
             <option value="15">{t('15 minutos', '15 minutes')}</option>
             <option value="30">{t('30 minutos', '30 minutes')}</option>
@@ -105,5 +114,9 @@ export function PauseControl({ branch, onChanged }: { branch: AdminBranch; onCha
 
 export function ReadinessList({ codes }: { codes: string[] }) {
   if (!codes.length) return null;
-  return <span className="muted small">{tr('Falta', 'Missing')}: {codes.map(readinessLabel).join(', ')}</span>;
+  return (
+    <span className="muted small">
+      {tr('Falta', 'Missing')}: {codes.map(readinessLabel).join(', ')}
+    </span>
+  );
 }

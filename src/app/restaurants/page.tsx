@@ -24,7 +24,10 @@ export default function RestaurantsPage() {
     <>
       <PageHeader
         title={t('Restaurantes', 'Restaurants')}
-        subtitle={t('Horarios, pedidos online, reparto, pagos y reservas de cada local', 'Hours, online orders, delivery, payments and reservations for each restaurant')}
+        subtitle={t(
+          'Horarios, pedidos online, reparto, pagos y reservas de cada local',
+          'Hours, online orders, delivery, payments and reservations for each restaurant',
+        )}
         actions={
           can('branch:create') ? (
             <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>
@@ -85,14 +88,20 @@ function CreateModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
   const [error, setError] = useState<string | null>(null);
   async function save() {
     const s = slug || slugify(name.replace(/^la toscana\s*/i, ''));
-    if (!name.trim() || !line1.trim() || !city.trim() || !/^[a-z0-9-]{2,40}$/.test(s)) return setError(t('Completa nombre, dirección y ciudad.', 'Fill in name, address and city.'));
+    if (!name.trim() || !line1.trim() || !city.trim() || !/^[a-z0-9-]{2,40}$/.test(s))
+      return setError(t('Completa nombre, dirección y ciudad.', 'Fill in name, address and city.'));
     setBusy(true);
     try {
       const r = await api<{ branch: AdminBranch }>('/api/v1/admin/branches', {
         method: 'POST',
         body: { slug: s, name: name.trim(), address: { line1: line1.trim(), city: city.trim(), postcode: postcode.trim() || undefined } },
       });
-      toast(t('Restaurante creado (sin publicar). Completa horario y contacto antes de activarlo.', 'Restaurant created (unpublished). Complete hours and contact details before enabling it.'));
+      toast(
+        t(
+          'Restaurante creado (sin publicar). Completa horario y contacto antes de activarlo.',
+          'Restaurant created (unpublished). Complete hours and contact details before enabling it.',
+        ),
+      );
       onCreated();
       router.push(`/restaurants/${r.branch.id}`);
     } catch (e) {

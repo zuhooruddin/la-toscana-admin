@@ -64,7 +64,8 @@ export function CouponModal({ coupon, onClose, onSaved }: { coupon: Coupon | nul
 
   async function save() {
     const pct = Number(f.percent.replace(',', '.'));
-    if (isNew && !/^[A-Z0-9-]{3,40}$/.test(f.code)) return setError(t('El código debe tener 3–40 letras, números o guiones.', 'The code must be 3–40 letters, numbers or hyphens.'));
+    if (isNew && !/^[A-Z0-9-]{3,40}$/.test(f.code))
+      return setError(t('El código debe tener 3–40 letras, números o guiones.', 'The code must be 3–40 letters, numbers or hyphens.'));
     if (!f.name.es?.trim()) return setError(t('Pon un nombre a la promoción.', 'Give the promotion a name.'));
     if (isNew && f.type === 'percent' && !(pct > 0 && pct <= 100)) return setError(t('Porcentaje entre 1 y 100.', 'Percentage between 1 and 100.'));
     setBusy(true);
@@ -135,7 +136,10 @@ export function CouponModal({ coupon, onClose, onSaved }: { coupon: Coupon | nul
         {error ? <Alert tone="danger">{error}</Alert> : null}
         {!isNew ? (
           <Alert tone="info">
-            {t('El tipo de descuento, el importe y las condiciones no se pueden cambiar una vez creado el código. Crea uno nuevo si necesitas otras condiciones.', 'The discount type, amount and conditions cannot be changed once the code is created. Create a new one if you need different conditions.')}
+            {t(
+              'El tipo de descuento, el importe y las condiciones no se pueden cambiar una vez creado el código. Crea uno nuevo si necesitas otras condiciones.',
+              'The discount type, amount and conditions cannot be changed once the code is created. Create a new one if you need different conditions.',
+            )}
           </Alert>
         ) : null}
         <TextField
@@ -155,26 +159,42 @@ export function CouponModal({ coupon, onClose, onSaved }: { coupon: Coupon | nul
               <option value="fixed">{t('Importe fijo', 'Fixed amount')}</option>
             </SelectField>
             {f.type === 'percent' ? (
-              <TextField label={t('Porcentaje (%)', 'Percentage (%)')} inputMode="decimal" value={f.percent} onChange={(e) => set({ percent: e.target.value })} />
+              <TextField
+                label={t('Porcentaje (%)', 'Percentage (%)')}
+                inputMode="decimal"
+                value={f.percent}
+                onChange={(e) => set({ percent: e.target.value })}
+              />
             ) : (
               <MoneyInput label={t('Descuento', 'Discount')} cents={f.amountCents} onChange={(amountCents) => set({ amountCents })} />
             )}
             {f.type === 'percent' ? (
-              <MoneyInput label={t('Descuento máximo (0 = sin límite)', 'Maximum discount (0 = no limit)')} cents={f.maxDiscountCents} onChange={(maxDiscountCents) => set({ maxDiscountCents })} />
+              <MoneyInput
+                label={t('Descuento máximo (0 = sin límite)', 'Maximum discount (0 = no limit)')}
+                cents={f.maxDiscountCents}
+                onChange={(maxDiscountCents) => set({ maxDiscountCents })}
+              />
             ) : (
               <span />
             )}
           </div>
           <div className="grid-3">
             <MoneyInput label={t('Pedido mínimo', 'Minimum order')} cents={f.minSubtotalCents} onChange={(minSubtotalCents) => set({ minSubtotalCents })} />
-            <SelectField label={t('Válido para', 'Valid for')} value={f.fulfilment} onChange={(e) => set({ fulfilment: e.target.value as typeof f.fulfilment })}>
+            <SelectField
+              label={t('Válido para', 'Valid for')}
+              value={f.fulfilment}
+              onChange={(e) => set({ fulfilment: e.target.value as typeof f.fulfilment })}
+            >
               <option value="any">{t('Recogida y reparto', 'Pickup and delivery')}</option>
               <option value="pickup">{t('Solo recogida', 'Pickup only')}</option>
               <option value="delivery">{t('Solo reparto', 'Delivery only')}</option>
             </SelectField>
             <TextField label={t('Válido desde', 'Valid from')} type="date" value={f.validFrom} onChange={(e) => set({ validFrom: e.target.value })} />
           </div>
-          <Field label={t('Restaurantes', 'Restaurants')} hint={me?.role === 'owner' ? t('Ninguno marcado = todos los restaurantes.', 'None selected = all restaurants.') : undefined}>
+          <Field
+            label={t('Restaurantes', 'Restaurants')}
+            hint={me?.role === 'owner' ? t('Ninguno marcado = todos los restaurantes.', 'None selected = all restaurants.') : undefined}
+          >
             <div className="row">
               {branches.map((b) => (
                 <label key={b.id} className="checkbox">
@@ -199,7 +219,12 @@ export function CouponModal({ coupon, onClose, onSaved }: { coupon: Coupon | nul
             onChange={(e) => set({ maxRedemptions: e.target.value })}
           />
         </div>
-        <Toggle label={t('Activo', 'Active')} hint={t('Los clientes pueden usar el código.', 'Customers can use the code.')} checked={f.active} onChange={(active) => set({ active })} />
+        <Toggle
+          label={t('Activo', 'Active')}
+          hint={t('Los clientes pueden usar el código.', 'Customers can use the code.')}
+          checked={f.active}
+          onChange={(active) => set({ active })}
+        />
         <Toggle label={t('Mostrar en la página de ofertas', 'Show on the offers page')} checked={f.public} onChange={(p) => set({ public: p })} />
       </div>
     </Modal>

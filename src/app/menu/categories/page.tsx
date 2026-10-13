@@ -10,10 +10,12 @@ import { useAuth } from '@/lib/auth';
 import { errorText } from '@/lib/format';
 import type { Category, Loc, MenuItem } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
+import { useT } from '@/lib/i18n';
 
 type Draft = { _id?: string; key: string; name: Loc; description: Loc; order: number; published: boolean; imageUrl: string | null };
 
 export default function CategoriesPage() {
+  const t = useT();
   const { can } = useAuth();
   const cats = useResource<{ items: Category[] }>('/api/v1/admin/menu/categories');
   const items = useResource<{ items: MenuItem[] }>('/api/v1/admin/menu/items');
@@ -26,8 +28,8 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader
-        title="Categorías"
-        subtitle="Secciones de la carta en la web y las apps"
+        title={t('Categorías', 'Categories')}
+        subtitle={t('Secciones de la carta en la web y las apps', 'Menu sections on the website and apps')}
         actions={
           can('menu:write') ? (
             <Button
@@ -35,7 +37,7 @@ export default function CategoriesPage() {
               icon="plus"
               onClick={() => setEdit({ key: '', name: { es: '' }, description: { es: '' }, order: nextOrder, published: false, imageUrl: null })}
             >
-              Nueva categoría
+              {t('Nueva categoría', 'New category')}
             </Button>
           ) : null
         }
@@ -45,17 +47,17 @@ export default function CategoriesPage() {
         {cats.loading ? (
           <Spinner />
         ) : list.length === 0 ? (
-          <Empty icon="layers" title="Todavía no hay categorías" />
+          <Empty icon="layers" title={t('Todavía no hay categorías', 'No categories yet')} />
         ) : (
           <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Orden</th>
-                  <th>Categoría</th>
-                  <th className="num">Productos</th>
-                  <th>Estado</th>
-                  <th aria-label="Acciones" />
+                  <th>{t('Orden', 'Order')}</th>
+                  <th>{t('Categoría', 'Category')}</th>
+                  <th className="num">{t('Productos', 'Products')}</th>
+                  <th>{t('Estado', 'Status')}</th>
+                  <th aria-label={t('Acciones', 'Actions')} />
                 </tr>
               </thead>
               <tbody>
@@ -83,7 +85,7 @@ export default function CategoriesPage() {
                         </div>
                       </td>
                       <td className="num">{counts.get(c.key) ?? 0}</td>
-                      <td>{c.published ? <Badge tone="green">Visible</Badge> : <Badge tone="grey">Oculta</Badge>}</td>
+                      <td>{c.published ? <Badge tone="green">{t('Visible', 'Visible')}</Badge> : <Badge tone="grey">{t('Oculta', 'Hidden')}</Badge>}</td>
                       <td className="num">
                         {can('menu:write') ? (
                           <Button
@@ -101,7 +103,7 @@ export default function CategoriesPage() {
                               })
                             }
                           >
-                            Editar
+                            {t('Editar', 'Edit')}
                           </Button>
                         ) : null}
                       </td>
@@ -119,6 +121,7 @@ export default function CategoriesPage() {
 }
 
 function CategoryModal({ draft, onClose, onSaved }: { draft: Draft; onClose: () => void; onSaved: () => void }) {
+  const t = useT();
   const { toast } = useFeedback();
   const [d, setD] = useState(draft);
   const [busy, setBusy] = useState(false);
@@ -127,7 +130,7 @@ function CategoryModal({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
   const set = (p: Partial<Draft>) => setD((x) => ({ ...x, ...p }));
 
   async function save() {
-    if (!d.name.es?.trim()) return setError('El nombre en español es obligatorio.');
+    if (!d.name.es?.trim()) return setError(t('El nombre en español es obligatorio.', 'The Spanish name is required.'));
     const key = d.key || slugify(d.name.es);
     setBusy(true);
     setError(null);
@@ -145,7 +148,7 @@ function CategoryModal({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
           body: { name: loc(d.name), description: loc(d.description), order: d.order, published: d.published, imageUrl: d.imageUrl },
         });
       }
-      toast(isNew ? 'Categoría creada' : 'Categoría guardada');
+      toast(isNew ? t('Categoría creada', 'Category created') : t('Categoría guardada', 'Category saved'));
       onSaved();
     } catch (e) {
       setError(errorText(e));
@@ -158,35 +161,43 @@ function CategoryModal({ draft, onClose, onSaved }: { draft: Draft; onClose: () 
     <Modal
       open
       onClose={onClose}
-      title={isNew ? 'Nueva categoría' : `Editar «${draft.name.es}»`}
+      title={isNew ? t('Nueva categoría', 'New category') : `${t('Editar', 'Edit')} «${draft.name.es}»`}
       size="lg"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="primary" loading={busy} onClick={() => void save()}>
-            Guardar
+            {t('Guardar', 'Save')}
           </Button>
         </>
       }
     >
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        <LocInput label="Nombre" value={d.name} onChange={(name) => set({ name, ...(isNew ? { key: slugify(name.es ?? '') } : {}) })} required maxLength={80} />
-        <LocInput label="Descripción" value={d.description} onChange={(description) => set({ description })} multiline maxLength={300} />
+        <LocInput
+          label={t('Nombre', 'Name')}
+          value={d.name}
+          onChange={(name) => set({ name, ...(isNew ? { key: slugify(name.es ?? '') } : {}) })}
+          required
+          maxLength={80}
+        />
+        <LocInput label={t('Descripción', 'Description')} value={d.description} onChange={(description) => set({ description })} multiline maxLength={300} />
         <div className="grid-2">
           <TextField
-            label="Clave (URL)"
+            label={t('Clave (URL)', 'Key (URL)')}
             value={d.key}
             disabled={!isNew}
             onChange={(e) => set({ key: slugify(e.target.value) })}
-            hint={isNew ? 'Se usa en la dirección: /carta#cat-clave' : 'No se puede cambiar.'}
+            hint={
+              isNew ? t('Se usa en la dirección: /carta#cat-clave', 'Used in the address: /carta#cat-key') : t('No se puede cambiar.', 'Cannot be changed.')
+            }
           />
-          <TextField label="Orden" type="number" value={d.order} onChange={(e) => set({ order: Number(e.target.value) })} />
+          <TextField label={t('Orden', 'Order')} type="number" value={d.order} onChange={(e) => set({ order: Number(e.target.value) })} />
         </div>
-        <ImageInput label="Imagen de la categoría" value={d.imageUrl} onChange={(imageUrl) => set({ imageUrl })} />
-        <Toggle label="Visible en la carta" checked={d.published} onChange={(published) => set({ published })} />
+        <ImageInput label={t('Imagen de la categoría', 'Category image')} value={d.imageUrl} onChange={(imageUrl) => set({ imageUrl })} />
+        <Toggle label={t('Visible en la carta', 'Visible on the menu')} checked={d.published} onChange={(published) => set({ published })} />
       </div>
     </Modal>
   );

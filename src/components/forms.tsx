@@ -235,7 +235,10 @@ export function GroupEditor({
           maxLength={80}
         />
         <div className="grid-3">
-          <Field label={t('Clave interna', 'Internal key')} hint={t('Minúsculas y guiones; no se puede cambiar después.', 'Lowercase and hyphens; cannot be changed later.')}>
+          <Field
+            label={t('Clave interna', 'Internal key')}
+            hint={t('Minúsculas y guiones; no se puede cambiar después.', 'Lowercase and hyphens; cannot be changed later.')}
+          >
             <input className="input" value={group.key} disabled={lockKey} onChange={(e) => set({ key: slugify(e.target.value) })} />
           </Field>
           <Field label={t('Mínimo a elegir', 'Minimum to choose')} error={invalid}>
@@ -249,7 +252,9 @@ export function GroupEditor({
           <input type="checkbox" checked={group.published !== false} onChange={(e) => set({ published: e.target.checked })} />
           {t('Visible para los clientes', 'Visible to customers')}
         </label>
-        <p className="section-title">{t('Opciones', 'Options')} ({group.choices.length})</p>
+        <p className="section-title">
+          {t('Opciones', 'Options')} ({group.choices.length})
+        </p>
         <div className="table-wrap">
           <table className="table">
             <thead>

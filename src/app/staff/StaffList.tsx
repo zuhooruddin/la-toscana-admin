@@ -12,7 +12,10 @@ import { useT } from '@/lib/i18n';
 
 const ROLE_HELP: Record<string, [string, string]> = {
   owner: ['Todo, incluidos ajustes, pagos y datos personales.', 'Everything, including settings, payments and personal data.'],
-  manager: ['Gestiona su restaurante: carta, pedidos, reembolsos, equipo, promociones y contenido.', 'Manages their restaurant: menu, orders, refunds, team, promotions and content.'],
+  manager: [
+    'Gestiona su restaurante: carta, pedidos, reembolsos, equipo, promociones y contenido.',
+    'Manages their restaurant: menu, orders, refunds, team, promotions and content.',
+  ],
   staff: ['Cocina y sala: pedidos, agotados, pausas y reservas.', 'Kitchen and floor: orders, sold-out items, pauses and reservations.'],
   driver: ['Solo la app de reparto: sus entregas asignadas.', 'Delivery app only: their assigned deliveries.'],
 };
@@ -30,7 +33,10 @@ export function StaffList({ roleFilter }: { roleFilter?: 'driver' }) {
         title={roleFilter === 'driver' ? t('Repartidores', 'Drivers') : t('Equipo y permisos', 'Team & permissions')}
         subtitle={
           roleFilter === 'driver'
-            ? t('Cuentas para la app de reparto. Se asignan a los pedidos a domicilio desde cada pedido.', 'Accounts for the delivery app. They are assigned to home-delivery orders from each order.')
+            ? t(
+                'Cuentas para la app de reparto. Se asignan a los pedidos a domicilio desde cada pedido.',
+                'Accounts for the delivery app. They are assigned to home-delivery orders from each order.',
+              )
             : t('Cuentas del personal y lo que puede hacer cada rol', 'Staff accounts and what each role can do')
         }
         actions={
@@ -58,7 +64,10 @@ export function StaffList({ roleFilter }: { roleFilter?: 'driver' }) {
         {r.loading ? (
           <Spinner />
         ) : items.length === 0 ? (
-          <Empty icon={roleFilter ? 'truck' : 'shield'} title={roleFilter ? t('Todavía no hay repartidores', 'No drivers yet') : t('No hay cuentas', 'No accounts')} />
+          <Empty
+            icon={roleFilter ? 'truck' : 'shield'}
+            title={roleFilter ? t('Todavía no hay repartidores', 'No drivers yet') : t('No hay cuentas', 'No accounts')}
+          />
         ) : (
           <div className="table-wrap">
             <table className="table">

@@ -2,8 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { api, ApiError, qs } from './api';
 import { errorText, nextStatuses, parseEur } from './format';
 
-const json = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
 /** Fake API: protected paths answer 401 until a refresh has happened. */
 function fakeApi(refreshStatus = 200) {
@@ -45,9 +44,15 @@ describe('api client session refresh', () => {
   });
 
   it('turns a network failure into a NETWORK ApiError and a non-JSON body into an HTTP error', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => Promise.reject(new TypeError('Failed to fetch'))));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Promise.reject(new TypeError('Failed to fetch'))),
+    );
     await expect(api('/api/v1/admin/orders')).rejects.toMatchObject({ code: 'NETWORK' });
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('<html>Bad gateway</html>', { status: 502 })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('<html>Bad gateway</html>', { status: 502 })),
+    );
     const e = await api('/api/v1/admin/orders').catch((x: unknown) => x);
     expect(e).toBeInstanceOf(ApiError);
     expect(e).toMatchObject({ status: 502, code: 'HTTP_ERROR' });

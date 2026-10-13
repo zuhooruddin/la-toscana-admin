@@ -89,7 +89,9 @@ function Board() {
                       <span className="muted small">{o.fulfilment.scheduledFor ? `⏰ ${formatTime(o.fulfilment.scheduledFor)}` : minutesAgo(o.createdAt)}</span>
                     </div>
                     <div className="row" style={{ gap: 6 }}>
-                      <Badge tone={o.fulfilment.type === 'delivery' ? 'violet' : 'blue'}>{o.fulfilment.type === 'delivery' ? t('Reparto', 'Delivery') : t('Recogida', 'Pickup')}</Badge>
+                      <Badge tone={o.fulfilment.type === 'delivery' ? 'violet' : 'blue'}>
+                        {o.fulfilment.type === 'delivery' ? t('Reparto', 'Delivery') : t('Recogida', 'Pickup')}
+                      </Badge>
                       <Badge tone={o.payment.status === 'paid' ? 'green' : 'grey'}>
                         {o.payment.method === 'cash' ? t('Efectivo', 'Cash') : t('Tarjeta', 'Card')} · {PAYMENT_LABEL[o.payment.status] ?? o.payment.status}
                       </Badge>
@@ -102,7 +104,11 @@ function Board() {
                           {l.options.length ? ` (${l.options.map((x) => x.choiceName).join(', ')})` : ''}
                         </span>
                       ))}
-                      {o.lines.length > 4 ? <span>+{o.lines.length - 4} {t('más…', 'more…')}</span> : null}
+                      {o.lines.length > 4 ? (
+                        <span>
+                          +{o.lines.length - 4} {t('más…', 'more…')}
+                        </span>
+                      ) : null}
                     </div>
                     {o.notes ? (
                       <p className="small" style={{ color: 'var(--amber)' }}>
@@ -229,7 +235,10 @@ export default function OrdersPage() {
   const [tab, setTab] = useState<'board' | 'history'>('board');
   return (
     <>
-      <PageHeader title={t('Pedidos', 'Orders')} subtitle={t('Los pedidos nuevos llegan en directo desde la web y la app.', 'New orders arrive live from the website and app.')} />
+      <PageHeader
+        title={t('Pedidos', 'Orders')}
+        subtitle={t('Los pedidos nuevos llegan en directo desde la web y la app.', 'New orders arrive live from the website and app.')}
+      />
       <Tabs
         value={tab}
         onChange={setTab}

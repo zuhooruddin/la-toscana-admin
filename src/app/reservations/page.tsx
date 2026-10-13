@@ -46,7 +46,10 @@ export default function ReservationsPage() {
       status === 'cancelled' &&
       !(await confirm({
         title: t('Cancelar reserva', 'Cancel reservation'),
-        message: t(`¿Cancelar la reserva de ${x.name} (${x.partySize} pers., ${x.time})?`, `Cancel the reservation for ${x.name} (${x.partySize} guests, ${x.time})?`),
+        message: t(
+          `¿Cancelar la reserva de ${x.name} (${x.partySize} pers., ${x.time})?`,
+          `Cancel the reservation for ${x.name} (${x.partySize} guests, ${x.time})?`,
+        ),
         danger: true,
         confirmLabel: t('Cancelar reserva', 'Cancel reservation'),
       }))
@@ -68,7 +71,14 @@ export default function ReservationsPage() {
     <>
       <PageHeader
         title={t('Reservas', 'Reservations')}
-        subtitle={r.data ? t(`${active.length} reservas · ${active.reduce((n, x) => n + x.partySize, 0)} comensales`, `${active.length} reservations · ${active.reduce((n, x) => n + x.partySize, 0)} guests`) : undefined}
+        subtitle={
+          r.data
+            ? t(
+                `${active.length} reservas · ${active.reduce((n, x) => n + x.partySize, 0)} comensales`,
+                `${active.length} reservations · ${active.reduce((n, x) => n + x.partySize, 0)} guests`,
+              )
+            : undefined
+        }
         actions={
           can('reservations:write') ? (
             <Button variant="primary" icon="plus" onClick={() => setCreating(true)}>

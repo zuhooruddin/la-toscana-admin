@@ -61,7 +61,12 @@ export function StaffModal({ user, defaultRole, onClose, onSaved }: { user: Staf
           method: 'PATCH',
           body: { name: f.name.trim(), phone: f.phone.trim(), role: f.role, branchIds: f.branchIds, status: f.active ? 'active' : 'disabled' },
         });
-        toast(t('Cuenta actualizada. Si cambiaste rol, restaurantes o estado, sus sesiones se han cerrado.', 'Account updated. If you changed the role, restaurants or status, their sessions have been signed out.'));
+        toast(
+          t(
+            'Cuenta actualizada. Si cambiaste rol, restaurantes o estado, sus sesiones se han cerrado.',
+            'Account updated. If you changed the role, restaurants or status, their sessions have been signed out.',
+          ),
+        );
         onSaved();
         onClose();
       }
@@ -126,7 +131,14 @@ export function StaffModal({ user, defaultRole, onClose, onSaved }: { user: Staf
           <TextField label={t('Nombre', 'Name')} value={f.name} onChange={(e) => set({ name: e.target.value })} required />
           <TextField label={t('Teléfono', 'Phone')} type="tel" value={f.phone} onChange={(e) => set({ phone: e.target.value })} />
         </div>
-        <TextField label={t('Correo (usuario)', 'Email (username)')} type="email" value={f.email} disabled={!isNew} onChange={(e) => set({ email: e.target.value })} required />
+        <TextField
+          label={t('Correo (usuario)', 'Email (username)')}
+          type="email"
+          value={f.email}
+          disabled={!isNew}
+          onChange={(e) => set({ email: e.target.value })}
+          required
+        />
         <SelectField label={t('Rol', 'Role')} value={f.role} onChange={(e) => set({ role: e.target.value as Role })}>
           {roles.map((r) => (
             <option key={r} value={r}>
@@ -149,7 +161,12 @@ export function StaffModal({ user, defaultRole, onClose, onSaved }: { user: Staf
           </div>
         </Field>
         {!isNew ? (
-          <Toggle label={t('Cuenta activa', 'Account active')} hint={t('Desactivarla cierra sus sesiones y le impide entrar.', 'Disabling it signs them out and blocks login.')} checked={f.active} onChange={(active) => set({ active })} />
+          <Toggle
+            label={t('Cuenta activa', 'Account active')}
+            hint={t('Desactivarla cierra sus sesiones y le impide entrar.', 'Disabling it signs them out and blocks login.')}
+            checked={f.active}
+            onChange={(active) => set({ active })}
+          />
         ) : null}
       </div>
     </Modal>

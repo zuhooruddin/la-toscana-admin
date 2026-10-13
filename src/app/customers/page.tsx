@@ -36,7 +36,13 @@ export default function CustomersPage() {
   const data = r.data ?? r.stale;
   return (
     <>
-      <PageHeader title={tt('Clientes', 'Customers')} subtitle={tt('Cuentas registradas en la web y la app. Los pedidos como invitado no crean cuenta.', 'Accounts registered on the website and app. Guest orders do not create an account.')} />
+      <PageHeader
+        title={tt('Clientes', 'Customers')}
+        subtitle={tt(
+          'Cuentas registradas en la web y la app. Los pedidos como invitado no crean cuenta.',
+          'Accounts registered on the website and app. Guest orders do not create an account.',
+        )}
+      />
       {r.error ? <Alert tone="danger">{errorText(r.error)}</Alert> : null}
       <Card padded={false}>
         <div className="filters" style={{ padding: '14px 14px 0' }}>

@@ -2,10 +2,15 @@
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
-export type Lang = 'es' | 'en';
-export const LANG_COOKIE = 'lt_lang';
+import { LANG_COOKIE, type Lang } from './i18n-config';
+
+export type { Lang };
 
 let current: Lang = 'es';
+/** Idempotent: keeps non-React helpers (formatters, label maps) in step with the provider's language. */
+const setCurrent = (l: Lang) => {
+  current = l;
+};
 /** Language for code that runs outside React components (formatters, label maps). */
 export const getLang = (): Lang => current;
 
@@ -28,9 +33,9 @@ const LangContext = createContext<Ctx>({ lang: 'es', setLang: () => {} });
 
 export function I18nProvider({ initial, children }: { initial: Lang; children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(initial);
-  current = lang; // set during render so descendants read the right value on first paint
+  setCurrent(lang); // during render so descendants read the right value on first paint
   const setLang = useCallback((l: Lang) => {
-    current = l;
+    setCurrent(l);
     document.cookie = `${LANG_COOKIE}=${l}; path=/; max-age=31536000; samesite=lax`;
     document.documentElement.lang = l;
     setLangState(l);

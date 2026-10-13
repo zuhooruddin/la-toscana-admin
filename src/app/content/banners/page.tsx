@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { errorText, formatDate } from '@/lib/format';
 import type { Loc } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
+import { labels, useT } from '@/lib/i18n';
 
 interface Banner {
   _id: string;
@@ -26,18 +27,31 @@ interface Banner {
   branchIds: string[];
 }
 
-const PLACEMENTS: Record<string, string> = {
-  home_top: 'Inicio · carrusel principal',
-  home_middle: 'Inicio · banda central',
-  app_promo: 'Inicio · promoción de la app',
-  app_promo_wide: 'Inicio · promoción de la app (ancha)',
-  menu_top: 'Carta · arriba',
-  menu_sidebar: 'Carta · lateral',
-  restaurants_top: 'Restaurantes · arriba',
-  checkout: 'Pago',
-};
+const PLACEMENTS = labels({
+  es: {
+    home_top: 'Inicio · carrusel principal',
+    home_middle: 'Inicio · banda central',
+    app_promo: 'Inicio · promoción de la app',
+    app_promo_wide: 'Inicio · promoción de la app (ancha)',
+    menu_top: 'Carta · arriba',
+    menu_sidebar: 'Carta · lateral',
+    restaurants_top: 'Restaurantes · arriba',
+    checkout: 'Pago',
+  },
+  en: {
+    home_top: 'Home · main carousel',
+    home_middle: 'Home · middle band',
+    app_promo: 'Home · app promotion',
+    app_promo_wide: 'Home · app promotion (wide)',
+    menu_top: 'Menu · top',
+    menu_sidebar: 'Menu · sidebar',
+    restaurants_top: 'Restaurants · top',
+    checkout: 'Checkout',
+  },
+});
 
 export default function BannersPage() {
+  const t = useT();
   const { can } = useAuth();
   const { toast, confirm } = useFeedback();
   const r = useResource<{ items: Banner[] }>('/api/v1/admin/banners');
@@ -47,10 +61,18 @@ export default function BannersPage() {
   const write = can('content:write');
 
   async function remove(b: Banner) {
-    if (!(await confirm({ title: 'Eliminar banner', message: `¿Eliminar «${b.title.es}»?`, danger: true, confirmLabel: 'Eliminar' }))) return;
+    if (
+      !(await confirm({
+        title: t('Eliminar banner', 'Delete banner'),
+        message: t(`¿Eliminar «${b.title.es}»?`, `Delete “${b.title.es}”?`),
+        danger: true,
+        confirmLabel: t('Eliminar', 'Delete'),
+      }))
+    )
+      return;
     try {
       await api(`/api/v1/admin/banners/${b._id}`, { method: 'DELETE' });
-      toast('Banner eliminado');
+      toast(t('Banner eliminado', 'Banner deleted'));
       r.reload();
     } catch (e) {
       toast(errorText(e), 'error');
@@ -60,8 +82,11 @@ export default function BannersPage() {
   return (
     <>
       <PageHeader
-        title="Banners"
-        subtitle="Imágenes y mensajes de la web (carrusel de inicio, promoción de la app…). Los cambios se ven en la web en un minuto."
+        title={t('Banners', 'Banners')}
+        subtitle={t(
+          'Imágenes y mensajes de la web (carrusel de inicio, promoción de la app…). Los cambios se ven en la web en un minuto.',
+          'Website images and messages (home carousel, app promotion…). Changes appear on the website within a minute.',
+        )}
         actions={
           write ? (
             <Button
@@ -69,7 +94,7 @@ export default function BannersPage() {
               icon="plus"
               onClick={() => setEdit({ placement: 'home_top', title: { es: '' }, active: false, order: items.length + 1, branchIds: [] })}
             >
-              Nuevo banner
+              {t('Nuevo banner', 'New banner')}
             </Button>
           ) : null
         }
@@ -79,7 +104,7 @@ export default function BannersPage() {
         <Spinner />
       ) : items.length === 0 ? (
         <Card>
-          <Empty icon="image" title="No hay banners" />
+          <Empty icon="image" title={t('No hay banners', 'No banners')} />
         </Card>
       ) : (
         <div className="stack">
@@ -111,17 +136,25 @@ export default function BannersPage() {
                               {b.link ? <div className="muted small mono">→ {b.link}</div> : null}
                             </td>
                             <td className="small">
-                              {b.startsAt || b.endsAt ? `${b.startsAt ? formatDate(b.startsAt) : '…'} – ${b.endsAt ? formatDate(b.endsAt) : '…'}` : 'Siempre'}
+                              {b.startsAt || b.endsAt
+                                ? `${b.startsAt ? formatDate(b.startsAt) : '…'} – ${b.endsAt ? formatDate(b.endsAt) : '…'}`
+                                : t('Siempre', 'Always')}
                             </td>
                             <td className="mono">#{b.order}</td>
-                            <td>{b.active ? <Badge tone="green">Activo</Badge> : <Badge tone="grey">Inactivo</Badge>}</td>
+                            <td>{b.active ? <Badge tone="green">{t('Activo', 'Active')}</Badge> : <Badge tone="grey">{t('Inactivo', 'Inactive')}</Badge>}</td>
                             <td className="num">
                               {write ? (
                                 <span className="row" style={{ justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                                   <Button size="sm" icon="edit" onClick={() => setEdit(b)}>
-                                    Editar
+                                    {t('Editar', 'Edit')}
                                   </Button>
-                                  <Button size="sm" variant="ghost" icon="trash" onClick={() => void remove(b)} aria-label={`Eliminar ${b.title.es}`} />
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    icon="trash"
+                                    onClick={() => void remove(b)}
+                                    aria-label={`${t('Eliminar', 'Delete')} ${b.title.es}`}
+                                  />
                                 </span>
                               ) : null}
                             </td>
@@ -141,6 +174,7 @@ export default function BannersPage() {
 }
 
 function BannerModal({ banner, onClose, onSaved }: { banner: Partial<Banner>; onClose: () => void; onSaved: () => void }) {
+  const t = useT();
   const { toast } = useFeedback();
   const isNew = !banner._id;
   const [b, setB] = useState({
@@ -159,8 +193,9 @@ function BannerModal({ banner, onClose, onSaved }: { banner: Partial<Banner>; on
   const [error, setError] = useState<string | null>(null);
   const set = (p: Partial<typeof b>) => setB((x) => ({ ...x, ...p }));
   async function save() {
-    if (!b.title.es?.trim()) return setError('El título en español es obligatorio.');
-    if (b.link && !/^(\/|https?:\/\/)/.test(b.link)) return setError('El enlace debe empezar por / (página de la web) o https://');
+    if (!b.title.es?.trim()) return setError(t('El título en español es obligatorio.', 'The Spanish title is required.'));
+    if (b.link && !/^(\/|https?:\/\/)/.test(b.link))
+      return setError(t('El enlace debe empezar por / (página de la web) o https://', 'The link must start with / (a website page) or https://'));
     setBusy(true);
     setError(null);
     const loc = (l: Loc) => ({ es: l.es ?? '', ...(l.en ? { en: l.en } : {}) });
@@ -179,7 +214,7 @@ function BannerModal({ banner, onClose, onSaved }: { banner: Partial<Banner>; on
     try {
       if (isNew) await api('/api/v1/admin/banners', { method: 'POST', body });
       else await api(`/api/v1/admin/banners/${banner._id}`, { method: 'PATCH', body });
-      toast('Banner guardado');
+      toast(t('Banner guardado', 'Banner saved'));
       onSaved();
     } catch (e) {
       setError(errorText(e));
@@ -191,15 +226,15 @@ function BannerModal({ banner, onClose, onSaved }: { banner: Partial<Banner>; on
     <Modal
       open
       onClose={onClose}
-      title={isNew ? 'Nuevo banner' : 'Editar banner'}
+      title={isNew ? t('Nuevo banner', 'New banner') : t('Editar banner', 'Edit banner')}
       size="lg"
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            Cancelar
+            {t('Cancelar', 'Cancel')}
           </Button>
           <Button variant="primary" loading={busy} onClick={() => void save()}>
-            Guardar
+            {t('Guardar', 'Save')}
           </Button>
         </>
       }
@@ -207,31 +242,39 @@ function BannerModal({ banner, onClose, onSaved }: { banner: Partial<Banner>; on
       <div className="stack">
         {error ? <Alert tone="danger">{error}</Alert> : null}
         <div className="grid-2">
-          <SelectField label="Ubicación" value={b.placement} onChange={(e) => set({ placement: e.target.value })}>
+          <SelectField label={t('Ubicación', 'Placement')} value={b.placement} onChange={(e) => set({ placement: e.target.value })}>
             {Object.entries(PLACEMENTS).map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
             ))}
           </SelectField>
-          <TextField label="Orden" type="number" value={b.order} onChange={(e) => set({ order: Number(e.target.value) })} />
+          <TextField label={t('Orden', 'Order')} type="number" value={b.order} onChange={(e) => set({ order: Number(e.target.value) })} />
         </div>
-        <LocInput label="Título" value={b.title} onChange={(title) => set({ title })} required maxLength={120} />
-        <LocInput label="Texto" value={b.body} onChange={(body) => set({ body })} multiline maxLength={300} />
+        <LocInput label={t('Título', 'Title')} value={b.title} onChange={(title) => set({ title })} required maxLength={120} />
+        <LocInput label={t('Texto', 'Text')} value={b.body} onChange={(body) => set({ body })} multiline maxLength={300} />
         <ImageInput
-          label="Imagen"
+          label={t('Imagen', 'Image')}
           value={b.imageUrl}
           onChange={(imageUrl) => set({ imageUrl })}
           purpose="banner"
-          hint="Usa fotos reales o márcalas como imagen ambiental en el texto alternativo."
+          hint={t(
+            'Usa fotos reales o márcalas como imagen ambiental en el texto alternativo.',
+            'Use real photos or mark them as ambient imagery in the alt text.',
+          )}
         />
-        <LocInput label="Texto alternativo de la imagen" value={b.imageAlt} onChange={(imageAlt) => set({ imageAlt })} maxLength={200} />
-        <TextField label="Enlace (opcional)" value={b.link} placeholder="/carta#cat-pizzas-artesanales" onChange={(e) => set({ link: e.target.value })} />
+        <LocInput label={t('Texto alternativo de la imagen', 'Image alt text')} value={b.imageAlt} onChange={(imageAlt) => set({ imageAlt })} maxLength={200} />
+        <TextField
+          label={t('Enlace (opcional)', 'Link (optional)')}
+          value={b.link}
+          placeholder="/carta#cat-pizzas-artesanales"
+          onChange={(e) => set({ link: e.target.value })}
+        />
         <div className="grid-2">
-          <TextField label="Mostrar desde" type="date" value={b.startsAt} onChange={(e) => set({ startsAt: e.target.value })} />
-          <TextField label="Mostrar hasta" type="date" value={b.endsAt} onChange={(e) => set({ endsAt: e.target.value })} />
+          <TextField label={t('Mostrar desde', 'Show from')} type="date" value={b.startsAt} onChange={(e) => set({ startsAt: e.target.value })} />
+          <TextField label={t('Mostrar hasta', 'Show until')} type="date" value={b.endsAt} onChange={(e) => set({ endsAt: e.target.value })} />
         </div>
-        <Toggle label="Activo" checked={b.active} onChange={(active) => set({ active })} />
+        <Toggle label={t('Activo', 'Active')} checked={b.active} onChange={(active) => set({ active })} />
       </div>
     </Modal>
   );

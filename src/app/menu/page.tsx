@@ -58,7 +58,11 @@ export default function MenuItemsPage() {
     <>
       <PageHeader
         title={t('Productos', 'Products')}
-        subtitle={items.data ? t(`${total} productos en la carta · ${noPhoto} sin foto real`, `${total} products on the menu · ${noPhoto} without a real photo`) : undefined}
+        subtitle={
+          items.data
+            ? t(`${total} productos en la carta · ${noPhoto} sin foto real`, `${total} products on the menu · ${noPhoto} without a real photo`)
+            : undefined
+        }
         actions={
           can('menu:write') ? (
             <Link href="/menu/new" className="btn btn-primary btn-md">
