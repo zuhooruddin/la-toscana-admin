@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner } from '@/components/ui/kit';
+import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner, Stat } from '@/components/ui/kit';
 import { qs } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useBranches } from '@/lib/branch';
@@ -48,6 +48,27 @@ export function StaffList({ roleFilter }: { roleFilter?: 'driver' }) {
         }
       />
       {r.error ? <Alert tone="danger">{errorText(r.error)}</Alert> : null}
+      <div className="grid-4 secondary-summary">
+        <Stat
+          icon={roleFilter ? 'truck' : 'users'}
+          tone="red"
+          label={roleFilter ? t('Repartidores', 'Drivers') : t('Cuentas', 'Accounts')}
+          value={r.data ? items.length : '—'}
+        />
+        <Stat icon="check" tone="green" label={t('Activas', 'Active accounts')} value={r.data ? items.filter((u) => u.status === 'active').length : '—'} />
+        <Stat
+          icon="shield"
+          tone="blue"
+          label={t('Desactivadas', 'Disabled accounts')}
+          value={r.data ? items.filter((u) => u.status === 'disabled').length : '—'}
+        />
+        <Stat
+          icon="key"
+          tone="amber"
+          label={t('Cambio de contraseña pendiente', 'Password change required')}
+          value={r.data ? items.filter((u) => u.mustChangePassword).length : '—'}
+        />
+      </div>
       {!roleFilter ? (
         <div className="grid-4" style={{ marginBottom: 16 }}>
           {Object.entries(ROLE_HELP).map(([role, help]) => (

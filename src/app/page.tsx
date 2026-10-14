@@ -15,12 +15,29 @@ import { useResource } from '@/lib/use-resource';
 import { useLang, useT } from '@/lib/i18n';
 import './dashboard.css';
 
-function SalesChart({ branchId, allowed }: { branchId?: string; allowed: boolean }) {
+function BranchMetrics({ branchId }: { branchId: string }) {
+  const t = useT();
+  const r = useResource<AnalyticsSummary>(`/api/v1/admin/analytics/summary${qs({ branchId })}`, { refreshMs: 60_000 });
+  return (
+    <div className="branch-metrics" title={r.error ? errorText(r.error) : undefined}>
+      <div>
+        <strong>{r.data?.orders ?? '—'}</strong>
+        <small>{t('Pedidos', 'Orders')}</small>
+      </div>
+      <div>
+        <strong>{r.data ? formatEur(r.data.netCents) : '—'}</strong>
+        <small>{t('Ventas', 'Sales')}</small>
+      </div>
+    </div>
+  );
+}
+
+function SalesChart({ branchId, allowed, revision }: { branchId?: string; allowed: boolean; revision: string }) {
   const t = useT();
   const { lang } = useLang();
   const [days, setDays] = useState(7);
   const [result, setResult] = useState<{ key: string; items: { day: string; summary: AnalyticsSummary }[]; error?: unknown } | null>(null);
-  const key = `${branchId ?? 'all'}:${days}:${todayLocal()}`;
+  const key = `${branchId ?? 'all'}:${days}:${todayLocal()}:${revision}`;
   useEffect(() => {
     if (!allowed) return;
     const ctrl = new AbortController();
@@ -163,7 +180,7 @@ export default function Dashboard() {
   const previous = useResource<AnalyticsSummary>(
     can('analytics:read') ? `/api/v1/admin/analytics/summary${qs({ branchId: branchParam, from: todayLocal(-1), to: todayLocal(-1) })}` : null,
   );
-  const active = useResource<{ items: AdminOrder[] }>(
+  const active = useResource<{ items: AdminOrder[]; total: number }>(
     can('orders:read') ? `/api/v1/admin/orders${qs({ active: 'true', branchId: branchParam, pageSize: 50 })}` : null,
     { refreshMs: 60_000 },
   );
@@ -248,7 +265,7 @@ export default function Dashboard() {
           icon="clock"
           tone="blue"
           label={t('Pedidos en curso', 'Active orders')}
-          value={active.data ? active.data.items.length : '—'}
+          value={active.data ? active.data.total : '—'}
           hint={active.error ? errorText(active.error) : t('En preparación y reparto', 'In progress')}
         />
       </div>
@@ -259,7 +276,7 @@ export default function Dashboard() {
         </Alert>
       ) : null}
       <div className="dashboard-panels">
-        <SalesChart branchId={branchParam} allowed={can('analytics:read')} />
+        <SalesChart branchId={branchParam} allowed={can('analytics:read')} revision={`${s?.orders ?? ''}:${s?.netCents ?? ''}`} />
         <Card title={t('Restaurantes', 'Restaurants')} actions={can('branch:read') ? viewAll('/restaurants') : undefined} className="restaurants-card">
           {branchesLoading ? (
             <Spinner />
@@ -274,6 +291,7 @@ export default function Dashboard() {
                   {can('branch:read') ? <Link href={`/restaurants/${b.id}`}>{b.name}</Link> : <strong>{b.name}</strong>}
                   <div>{orderingBadge(b)}</div>
                 </div>
+                <BranchMetrics branchId={b.id} />
                 <PauseControl branch={b} onChanged={reloadBranches} />
               </div>
             ))
@@ -431,7 +449,11 @@ export default function Dashboard() {
             icon="store"
             tone="green"
             label={t('Restaurantes activos', 'Accepting orders')}
-            value={visibleBranches.filter((b) => b.ordering.enabled && !b.ordering.paused).length}
+            value={
+              visibleBranches.filter(
+                (b) => b.ordering.enabled && (!b.ordering.paused || (b.ordering.pausedUntil && new Date(b.ordering.pausedUntil) <= new Date())),
+              ).length
+            }
             hint={t('Disponibles para nuevos pedidos', 'Ready for new orders')}
           />
         </div>

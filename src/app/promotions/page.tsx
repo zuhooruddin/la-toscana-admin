@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFeedback } from '@/components/ui/feedback';
-import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner } from '@/components/ui/kit';
+import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner, Stat } from '@/components/ui/kit';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useBranches } from '@/lib/branch';
@@ -47,6 +47,22 @@ export default function PromotionsPage() {
         }
       />
       {r.error ? <Alert tone="danger">{errorText(r.error)}</Alert> : null}
+      <div className="grid-4 secondary-summary">
+        <Stat icon="tag" tone="red" label={t('Códigos', 'Discount codes')} value={r.data ? items.length : '—'} />
+        <Stat icon="check" tone="green" label={t('Activados', 'Enabled')} value={r.data ? items.filter((c) => c.active).length : '—'} />
+        <Stat
+          icon="clock"
+          tone="amber"
+          label={t('Caducados', 'Expired')}
+          value={r.data ? items.filter((c) => c.validTo && new Date(c.validTo) < new Date()).length : '—'}
+        />
+        <Stat
+          icon="orders"
+          tone="blue"
+          label={t('Usos totales', 'Total redemptions')}
+          value={r.data ? items.reduce((n, c) => n + (c.redemptions ?? 0), 0) : '—'}
+        />
+      </div>
       <Card padded={false}>
         {r.loading ? (
           <Spinner />

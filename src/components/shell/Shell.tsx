@@ -9,6 +9,7 @@ import { ROLE_LABEL } from '@/lib/format';
 import { LangSwitch, useT } from '@/lib/i18n';
 import { RealtimeProvider, useRealtime } from '@/lib/realtime';
 import { Icon, type IconName } from '../ui/Icon';
+import './secondary-pages.css';
 
 interface NavItem {
   href: string;
@@ -124,7 +125,8 @@ function Sidebar({ onNavigate }: { onNavigate: () => void }) {
 }
 
 function Topbar({ onMenu }: { onMenu: () => void }) {
-  const { me } = useAuth();
+  const { me, can } = useAuth();
+  const [search, setSearch] = useState('');
   const { branches, selected, select } = useBranches();
   const { connected, sound, setSound } = useRealtime();
   const t = useT();
@@ -152,11 +154,37 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
           {branches[0].name}
         </span>
       ) : null}
-      <Link href="/orders" className="topbar-search">
+      <div className="topbar-search">
         <Icon name="search" />
-        <span>{t('Buscar pedidos, clientes, productos…', 'Search orders, customers, products…')}</span>
-        <Icon name="right" size={14} />
-      </Link>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => e.key === 'Escape' && setSearch('')}
+          placeholder={t('Buscar secciones del panel…', 'Search dashboard sections…')}
+          aria-label={t('Buscar secciones del panel', 'Search dashboard sections')}
+        />
+        {search.trim() ? (
+          <div className="nav-search-results">
+            {NAV.flatMap((group) => group.items)
+              .filter(
+                (item) =>
+                  (!item.perm || can(item.perm)) &&
+                  t(...item.label)
+                    .toLowerCase()
+                    .includes(search.trim().toLowerCase()),
+              )
+              .map((item) => (
+                <Link key={item.href} href={item.href} onClick={() => setSearch('')}>
+                  <Icon name={item.icon} />
+                  {t(...item.label)}
+                </Link>
+              ))}
+            <button type="button" onClick={() => setSearch('')}>
+              {t('Cerrar búsqueda', 'Close search')}
+            </button>
+          </div>
+        ) : null}
+      </div>
       <span className="spacer" />
       <span
         className="live-dot"
@@ -199,6 +227,8 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
 
 export function Shell({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false);
+  const pathname = usePathname() ?? '/';
+  const preserveDesign = pathname === '/' || ['/orders', '/menu', '/reports'].some((path) => pathname === path || pathname.startsWith(`${path}/`));
   return (
     <BranchProvider>
       <RealtimeProvider>
@@ -206,7 +236,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Sidebar onNavigate={() => setNavOpen(false)} />
           <div className="main">
             <Topbar onMenu={() => setNavOpen(true)} />
-            <main className="content" id="main">
+            <main className={`content${preserveDesign ? '' : ' secondary-pages'}`} id="main">
               {children}
             </main>
           </div>

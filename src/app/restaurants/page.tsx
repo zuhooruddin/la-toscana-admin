@@ -7,7 +7,7 @@ import { orderingBadge, PauseControl, ReadinessList } from '@/components/BranchS
 import { slugify } from '@/components/forms';
 import { useFeedback } from '@/components/ui/feedback';
 import { Icon } from '@/components/ui/Icon';
-import { Alert, Badge, Button, Card, Modal, PageHeader, Spinner, TextField } from '@/components/ui/kit';
+import { Alert, Badge, Button, Card, Modal, PageHeader, Spinner, Stat, TextField } from '@/components/ui/kit';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useBranches } from '@/lib/branch';
@@ -36,6 +36,17 @@ export default function RestaurantsPage() {
           ) : null
         }
       />
+      <div className="grid-4 secondary-summary">
+        <Stat icon="store" tone="red" label={t('Restaurantes', 'Restaurants')} value={loading ? '—' : branches.length} />
+        <Stat icon="eye" tone="green" label={t('Publicados', 'Published')} value={loading ? '—' : branches.filter((b) => b.published).length} />
+        <Stat icon="truck" tone="blue" label={t('Con reparto', 'With delivery')} value={loading ? '—' : branches.filter((b) => b.services?.delivery).length} />
+        <Stat
+          icon="calendar"
+          tone="amber"
+          label={t('Reservas online', 'Online reservations')}
+          value={loading ? '—' : branches.filter((b) => b.reservations?.enabled).length}
+        />
+      </div>
       {loading ? (
         <Spinner />
       ) : (
@@ -51,6 +62,8 @@ export default function RestaurantsPage() {
               }
             >
               <div className="stack" style={{ gap: 10 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {b.imageUrl ? <img src={b.imageUrl} alt={b.name} className="restaurant-cover" /> : null}
                 <p className="muted small">
                   <Icon name="pin" size={14} /> {b.address.line1}, {b.address.postcode ?? ''} {b.address.city}
                 </p>

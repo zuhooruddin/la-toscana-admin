@@ -6,6 +6,7 @@ import { Alert, Button, TextField } from '@/components/ui/kit';
 import { useAuth } from '@/lib/auth';
 import { errorText } from '@/lib/format';
 import { LangSwitch, useT } from '@/lib/i18n';
+import './login.css';
 
 function LoginForm() {
   const { login } = useAuth();
@@ -37,9 +38,8 @@ function LoginForm() {
     <main className="auth-page">
       <form className="auth-card" onSubmit={submit} noValidate>
         <div className="brand">
-          <span className="logo" aria-hidden="true">
-            LT
-          </span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.webp" className="login-logo" alt="La Toscana Pizzeria" />
           <div>
             <h1>{t('Panel de gestión', 'Admin panel')}</h1>
             <p className="muted small">La Toscana Pizzeria</p>

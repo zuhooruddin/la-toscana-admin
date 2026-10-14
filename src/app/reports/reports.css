@@ -1,0 +1,358 @@
+﻿.reports-page {
+  display: grid;
+  gap: 16px;
+}
+.reports-page .page-header {
+  margin-bottom: 2px;
+  align-items: center;
+}
+.reports-page .page-header h1 {
+  font-size: 29px;
+  letter-spacing: -0.035em;
+}
+.reports-page .page-header p {
+  font-size: 13px;
+  margin-top: 4px;
+}
+.reports-page .page-actions .btn {
+  background: white;
+  font-size: 12px;
+  min-height: 38px;
+}
+.report-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.report-ranges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-right: 10px;
+}
+.report-ranges button {
+  border: 1px solid #efefef;
+  border-radius: 8px;
+  background: white;
+  padding: 9px 13px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.report-ranges button[aria-pressed='true'] {
+  background: #ffdfe3;
+  color: #e3162e;
+  border-color: #ffd1d9;
+  font-weight: 600;
+}
+.report-filters label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: white;
+}
+.report-filters input {
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  min-width: 115px;
+  background: transparent;
+  color: var(--text);
+}
+.report-stats .stat {
+  padding: 17px;
+  min-height: 116px;
+  box-shadow: 0 3px 12px #32150004;
+}
+.report-stats .stat-ic {
+  height: 50px;
+  width: 50px;
+  border-radius: 16px;
+}
+.report-stats .stat-label {
+  font-size: 12px;
+}
+.report-stats .stat-value {
+  font-size: 25px;
+  white-space: nowrap;
+}
+.report-stats .stat-hint {
+  font-size: 10px;
+  margin-top: 4px;
+}
+.report-trend {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 500;
+  background: #e5f8ee;
+  color: #04a858;
+}
+.report-trend.down {
+  color: #f02440;
+  background: #ffecee;
+}
+.report-panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.reports-page .card {
+  border-radius: 12px;
+  box-shadow: 0 3px 16px #261d1204;
+}
+.reports-page .card-head h2 {
+  font-size: 15px;
+}
+.report-select {
+  width: auto;
+  font-size: 11px;
+  padding: 7px 10px;
+}
+.report-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  font-size: 10px;
+  color: var(--muted);
+}
+.report-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.report-legend i,
+.report-payment-key i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.report-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 160px;
+}
+.report-chart text {
+  font-family: var(--font);
+  font-size: 10px;
+  fill: #77808d;
+}
+.report-payment {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  min-height: 160px;
+}
+.report-donut {
+  height: 146px;
+  width: 146px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.report-donut > div {
+  width: 108px;
+  height: 108px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.report-donut strong {
+  font-size: 16px;
+}
+.report-donut small {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.report-payment-key {
+  flex: 1;
+  min-width: 0;
+}
+.report-payment-key > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #f2f2f2;
+  padding: 10px 0;
+  font-size: 11px;
+}
+.report-payment-key span {
+  flex: 1;
+}
+.report-payment-key strong {
+  font-weight: 500;
+  white-space: nowrap;
+}
+.report-payment-key small {
+  color: var(--muted);
+}
+.report-note {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.reports-page .table th {
+  text-transform: none;
+  font-size: 10px;
+  letter-spacing: 0;
+  font-weight: 500;
+  background: #faf9f8;
+  padding: 7px 14px;
+}
+.reports-page .table td {
+  font-size: 11px;
+  padding: 8px 14px;
+}
+.report-share {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.report-share .bar {
+  flex: 1;
+  min-width: 75px;
+  background: #ffe9ed;
+  height: 8px;
+}
+.report-share small {
+  color: var(--muted);
+  min-width: 28px;
+}
+.report-status-list {
+  display: grid;
+}
+.report-status-list > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
+  font-size: 11px;
+}
+.report-status-list > div > span {
+  flex: 1;
+}
+.report-status-list strong {
+  font-weight: 500;
+  color: var(--muted);
+}
+.report-status-list .bar {
+  width: 100px;
+  height: 9px;
+}
+.report-status-list small {
+  color: var(--muted);
+  min-width: 25px;
+  text-align: right;
+}
+.hour-chart {
+  display: flex;
+  gap: 6px;
+  height: 145px;
+  background: repeating-linear-gradient(to top, transparent 0, transparent calc(25% - 1px), #f0f0f0 calc(25% - 1px), #f0f0f0 25%);
+}
+.hour-chart > div {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+.hour-bar {
+  height: calc(100% - 20px);
+  display: flex;
+  align-items: flex-end;
+}
+.hour-bar span {
+  width: 100%;
+  background: linear-gradient(#ff8594, #ff344e);
+  border: 1px solid #ff5167;
+  border-radius: 2px 2px 0 0;
+}
+.hour-chart small {
+  display: block;
+  font-size: 9px;
+  text-align: center;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.report-summary {
+  margin: 0 0 12px;
+}
+.report-summary > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f1f1;
+}
+.report-summary dt {
+  color: #5e6776;
+}
+.report-summary dd {
+  margin: 0;
+  font-weight: 600;
+}
+@media (max-width: 1250px) {
+  .report-payment {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .report-payment-key {
+    min-width: 180px;
+  }
+  .report-stats .stat-value {
+    font-size: 21px;
+  }
+}
+@media (max-width: 1000px) {
+  .report-panels {
+    grid-template-columns: 1fr;
+  }
+  .report-payment {
+    flex-wrap: nowrap;
+  }
+}
+@media (max-width: 600px) {
+  .report-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .report-stats .stat {
+    flex-direction: column;
+    padding: 12px;
+    gap: 8px;
+  }
+  .report-stats .stat-value {
+    font-size: 20px;
+    white-space: normal;
+  }
+  .report-payment {
+    flex-wrap: wrap;
+  }
+  .hour-chart {
+    gap: 3px;
+  }
+  .hour-chart small {
+    font-size: 7px;
+  }
+  .report-filters label {
+    flex: 1;
+  }
+  .report-ranges {
+    margin: 0;
+  }
+}

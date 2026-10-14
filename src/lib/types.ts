@@ -86,6 +86,7 @@ export interface AdminOrder {
     estimatedReadyAt?: string | null;
   };
   lines: {
+    imageUrl?: string | null;
     name: string;
     quantity: number;
     options: { groupName?: string; choiceName?: string; priceDeltaCents?: number }[];

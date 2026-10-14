@@ -1,0 +1,47 @@
+.auth-page {
+  background: radial-gradient(ellipse at 15% 10%, #442417 0, transparent 50%), linear-gradient(135deg, #24150e, #110c09);
+}
+.auth-page .auth-card {
+  width: min(440px, 100%);
+  border-radius: 18px;
+  border: 1px solid #eae5e0;
+  box-shadow: 0 30px 80px #0004;
+  padding: 32px;
+  gap: 20px;
+}
+.auth-page .brand {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  padding-bottom: 10px;
+}
+.auth-page .login-logo {
+  width: 122px;
+  height: 80px;
+  object-fit: contain;
+}
+.auth-page .brand h1 {
+  font-size: 24px;
+  letter-spacing: -0.035em;
+  margin-bottom: 4px;
+}
+.auth-page .input {
+  border-color: #e3e4e7;
+  border-radius: 8px;
+  min-height: 42px;
+  font-size: 13px;
+}
+.auth-page .btn-primary {
+  min-height: 42px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+@media (max-width: 500px) {
+  .auth-page {
+    padding: 18px;
+  }
+  .auth-page .auth-card {
+    padding: 24px;
+  }
+}

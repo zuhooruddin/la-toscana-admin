@@ -421,3 +421,24 @@
     gap: 10px;
   }
 }
+.branch-metrics {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+}
+.branch-metrics small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+.restaurant-row {
+  flex-wrap: wrap;
+}
+@media (max-width: 1300px) {
+  .branch-metrics {
+    gap: 12px;
+  }
+  .restaurant-photo {
+    width: 44px;
+  }
+}

@@ -1,0 +1,271 @@
+/* Applies only to pages outside Dashboard, Orders, Menu and Reports. */
+.secondary-pages {
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+.secondary-pages .page-header {
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.secondary-pages .page-header h1 {
+  font-size: 29px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  color: #10131b;
+}
+.secondary-pages .page-header p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 5px;
+  max-width: 760px;
+  color: #77808e;
+}
+.secondary-pages .page-actions {
+  gap: 8px;
+}
+.secondary-pages .btn {
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.secondary-pages .btn-md {
+  min-height: 38px;
+  padding: 0 14px;
+}
+.secondary-pages .btn-sm {
+  min-height: 31px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+.secondary-pages .btn-secondary {
+  background: white;
+  border-color: #e6e5e3;
+  box-shadow: 0 2px 5px #26150003;
+}
+.secondary-pages .btn-ghost:hover {
+  background: #fff0f2;
+}
+.secondary-pages .card {
+  background: white;
+  border: 1px solid #eeece9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 18px #211a1004;
+}
+.secondary-pages .card-flush {
+  padding: 0;
+  overflow: hidden;
+}
+.secondary-pages .card-head {
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.secondary-pages .card-head h2 {
+  font-size: 15px;
+  letter-spacing: -0.025em;
+}
+.secondary-pages .card-flush .card-head {
+  padding: 16px 20px;
+  margin: 0;
+}
+.secondary-pages .filters {
+  background: white;
+  border: 1px solid #eeece9;
+  border-radius: 10px;
+  padding: 12px 14px;
+  gap: 10px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.secondary-pages .card > .filters {
+  border: 0;
+  border-bottom: 1px solid #efeeec;
+  border-radius: 0;
+  padding: 14px 16px !important;
+  margin: 0;
+}
+.secondary-pages .input {
+  border-color: #e5e6e8;
+  border-radius: 7px;
+  font-size: 12px;
+  min-height: 36px;
+  background: white;
+}
+.secondary-pages .search {
+  border-color: #e5e6e8;
+  border-radius: 7px;
+  background: white;
+  min-height: 36px;
+}
+.secondary-pages .search input {
+  font-size: 12px;
+}
+.secondary-pages .table th {
+  background: #faf9f8;
+  color: #717a89;
+  text-transform: none;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 12px 16px;
+  border-color: #efeeec;
+  white-space: nowrap;
+}
+.secondary-pages .table td {
+  font-size: 12px;
+  padding: 12px 16px;
+  border-color: #f0efed;
+  vertical-align: middle;
+}
+.secondary-pages .table tbody tr:hover {
+  background: #fffafb;
+}
+.secondary-pages .table td strong {
+  font-weight: 650;
+}
+.secondary-pages .table a {
+  color: #202633;
+  text-decoration: none;
+}
+.secondary-pages .table a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+.secondary-pages .badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.secondary-pages .thumb,
+.secondary-pages .thumb-ph {
+  width: 54px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.secondary-pages .tabs {
+  gap: 8px;
+  margin-bottom: 18px;
+  border-bottom-color: #e9e7e4;
+  overflow-x: auto;
+}
+.secondary-pages .tab {
+  font-size: 13px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+.secondary-pages .tab[aria-selected='true'] {
+  color: #e71c31;
+  border-bottom-color: var(--brand);
+}
+.secondary-pages .stat {
+  min-height: 110px;
+  border-color: #eeece9;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px #211a1004;
+  align-items: center;
+  padding: 18px;
+}
+.secondary-pages .stat-ic {
+  width: 48px;
+  height: 50px;
+  border-radius: 15px;
+}
+.secondary-pages .stat-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+.secondary-pages .stat-value {
+  font-size: 25px;
+  letter-spacing: -0.02em;
+}
+.secondary-pages .stat-hint {
+  font-size: 11px;
+}
+.secondary-pages .secondary-summary {
+  margin-bottom: 18px;
+}
+.secondary-pages .empty {
+  padding: 45px 22px;
+}
+.secondary-pages .field-label,
+.secondary-pages .toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+.secondary-pages .field-hint {
+  font-size: 11px;
+  line-height: 1.6;
+}
+.secondary-pages .alert {
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.secondary-pages .kv {
+  font-size: 12px;
+  gap: 12px 18px;
+}
+.secondary-pages .switch {
+  height: 22px;
+  width: 38px;
+}
+.secondary-pages .switch span {
+  height: 16px;
+  width: 16px;
+}
+.secondary-pages .restaurant-cover {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.secondary-pages .pagination {
+  padding: 12px 16px;
+  background: #fdfdfd;
+}
+@media (max-width: 1100px) {
+  .secondary-pages .page-header {
+    align-items: flex-start;
+  }
+  .secondary-pages .page-actions {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 600px) {
+  .secondary-pages .page-header {
+    gap: 14px;
+  }
+  .secondary-pages .page-header h1 {
+    font-size: 25px;
+  }
+  .secondary-pages .page-actions {
+    width: 100%;
+  }
+  .secondary-pages .filters {
+    align-items: stretch;
+  }
+  .secondary-pages .filters .search {
+    width: 100%;
+  }
+  .secondary-pages .card {
+    padding: 16px;
+  }
+  .secondary-pages .card-flush {
+    padding: 0;
+  }
+  .secondary-pages .secondary-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .secondary-pages .secondary-summary .stat {
+    padding: 12px;
+    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

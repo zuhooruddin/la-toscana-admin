@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFeedback } from '@/components/ui/feedback';
-import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner } from '@/components/ui/kit';
+import { Alert, Badge, Button, Card, Empty, PageHeader, Spinner, Stat } from '@/components/ui/kit';
 import { api, qs } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useBranches } from '@/lib/branch';
@@ -87,6 +87,22 @@ export default function ReservationsPage() {
           ) : null
         }
       />
+      <div className="grid-4 secondary-summary">
+        <Stat icon="calendar" tone="red" label={t('Reservas', 'Reservations')} value={r.data ? items.length : '—'} />
+        <Stat
+          icon="users"
+          tone="blue"
+          label={t('Comensales previstos', 'Expected guests')}
+          value={r.data ? items.filter((x) => x.status === 'confirmed' || x.status === 'seated').reduce((n, x) => n + x.partySize, 0) : '—'}
+        />
+        <Stat icon="check" tone="green" label={t('Sentados', 'Seated')} value={r.data ? items.filter((x) => x.status === 'seated').length : '—'} />
+        <Stat
+          icon="clock"
+          tone="amber"
+          label={t('Pendientes de llegada', 'Awaiting arrival')}
+          value={r.data ? items.filter((x) => x.status === 'confirmed').length : '—'}
+        />
+      </div>
       <div className="filters">
         <Button size="sm" variant={date === todayLocal() ? 'secondary' : 'ghost'} onClick={() => setDate(todayLocal())}>
           {t('Hoy', 'Today')}
