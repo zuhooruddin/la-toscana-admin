@@ -9,6 +9,8 @@ type Status = 'loading' | 'anonymous' | 'ready';
 
 
 
+
+
 interface AuthValue {
   status: Status;
   me: Me | null;
