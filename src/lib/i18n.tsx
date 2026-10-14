@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 
 import { LANG_COOKIE, type Lang } from './i18n-config';
 
+
+
 export type { Lang };
 
 let current: Lang = 'es';
